@@ -1878,16 +1878,21 @@ window.addEventListener('DOMContentLoaded', () => {
 async function fetchConnectedName() {
   const url = getUrl();
   if (!url) return;
+  const badge = el('connBadge');
+  // Show fallback immediately so user knows they are connected
+  badge.textContent = '✓ מחובר';
+  badge.classList.add('visible');
   try {
-    const r = await fetch(url + '?action=name', {redirect: 'follow'});
+    const r = await fetch(url + '?action=name');
     const text = await r.text();
+    console.log('name response:', text);
     const d = JSON.parse(text);
-    if (d.name) {
-      const badge = el('connBadge');
+    if (d && d.name) {
       badge.textContent = d.name;
-      badge.classList.add('visible');
     }
-  } catch(e) { console.log('name fetch error:', e); }
+  } catch(e) {
+    console.log('name fetch error:', e);
+  }
 }
 
 // ═══════════════════════════════════════════
