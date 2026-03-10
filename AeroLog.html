@@ -1314,20 +1314,25 @@ tbody td:first-child { color: var(--text); font-weight: 600; font-family: var(--
 }
 
 .load-bar-wrap {
-  margin: 0 0 8px; direction: rtl;
+  margin: 0 0 12px; direction: rtl;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 14px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
+.load-bar-icon { font-size: 26px; }
+.load-bar-title { font-size: 13px; color: var(--text2); font-weight: 500; }
 .load-bar-track {
-  width: 100%; height: 4px; background: var(--raised);
-  border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
+  width: 100%; height: 6px; background: var(--raised);
+  border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
 }
 .load-bar-fill {
-  height: 100%; border-radius: 4px;
+  height: 100%; border-radius: 6px;
   background: linear-gradient(90deg, var(--accent) 0%, var(--emerald) 100%);
   transition: width .25s ease; width: 0%;
 }
 .load-bar-label {
-  font-size: 10px; color: var(--text3); font-family: var(--mono);
-  margin-top: 3px; text-align: right; letter-spacing: .02em;
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+  text-align: center; letter-spacing: .02em;
 }
 
 .accord-head {
@@ -1390,33 +1395,37 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 /* ── SETTINGS ACTION BUTTONS ── */
 .settings-action-btn {
   width: 100%;
-  padding: 12px 16px;
-  background: var(--raised);
-  border: 1.5px solid var(--border2);
+  padding: 13px 18px;
+  background: linear-gradient(135deg, var(--accent), var(--blue-700));
+  border: none;
   border-radius: var(--r-sm);
-  color: var(--text2);
+  color: #fff;
   font-family: var(--sans);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  text-align: right;
-  transition: all .15s;
+  text-align: center;
+  transition: opacity .15s, transform .1s;
   direction: rtl;
+  box-shadow: 0 3px 12px #3b82f630;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.settings-action-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent2);
-  background: var(--hover);
+.settings-action-btn:hover { opacity: .88; }
+.settings-action-btn:active { transform: scale(0.98); }
+.settings-action-btn.secondary {
+  background: var(--raised);
+  border: 1.5px solid var(--border2);
+  color: var(--text2);
+  box-shadow: none;
+}
+.settings-action-btn.secondary:hover {
+  border-color: var(--accent); color: var(--accent2); background: var(--hover);
 }
 .settings-action-btn.danger {
-  border-color: #7f1d1d;
-  color: #fca5a5;
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  box-shadow: 0 3px 12px #ef444420;
 }
-.settings-action-btn.danger:hover {
-  border-color: var(--red);
-  color: var(--red);
-  background: #1c0808;
-}
+.settings-action-btn.danger:hover { opacity: .85; }
 
 </style>
 </head>
@@ -1656,8 +1665,10 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       </button>
     </div>
     <div class="load-bar-wrap" id="loadBarStats" style="display:none;">
+      <div class="load-bar-icon">📊</div>
+      <div class="load-bar-title">טוען נתוני טיסות...</div>
       <div class="load-bar-track" dir="ltr"><div class="load-bar-fill" id="loadBarStatsFill"></div></div>
-      <div class="load-bar-label" id="loadBarStatsLabel"></div>
+      <div class="load-bar-label" id="loadBarStatsLabel">מתחבר לשרת...</div>
     </div>
     <div class="fetch-bar-wrap" id="statsLoadBar" style="display:none;">
       <div class="fetch-bar-track" dir="ltr">
@@ -1773,8 +1784,10 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       </button>
     </div>
     <div class="load-bar-wrap" id="loadBarHist" style="display:none;">
+      <div class="load-bar-icon">📅</div>
+      <div class="load-bar-title">טוען נתוני טיסות...</div>
       <div class="load-bar-track" dir="ltr"><div class="load-bar-fill" id="loadBarHistFill"></div></div>
-      <div class="load-bar-label" id="loadBarHistLabel"></div>
+      <div class="load-bar-label" id="loadBarHistLabel">מתחבר לשרת...</div>
     </div>
     <div class="fetch-bar-wrap" id="histLoadBar" style="display:none;">
       <div class="fetch-bar-track" dir="ltr">
@@ -1877,7 +1890,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
         <div id="currentUrlDisplay" style="font-family:var(--mono);font-size:10px;color:var(--text3);
           background:var(--bg);border:1px solid var(--border);border-radius:6px;
           padding:8px 10px;direction:ltr;word-break:break-all;line-height:1.5;"></div>
-        <button class="settings-action-btn" onclick="openSetup()">
+        <button class="settings-action-btn secondary" onclick="openSetup()">
           ✏️ שנה כתובת Apps Script
         </button>
       </div>
@@ -2323,7 +2336,7 @@ async function loadStats() {
     ['Stats','Hist'].forEach(function(k) {
       var wrap = el('loadBar'+k), fill = el('loadBar'+k+'Fill'), lbl = el('loadBar'+k+'Label');
       if (!wrap) return;
-      wrap.style.display = 'block';
+      wrap.style.display = 'flex';
       if (fill) fill.style.width = Math.round(pct) + '%';
       if (lbl)  lbl.textContent  = label;
     });
@@ -2403,8 +2416,8 @@ async function loadJournal() {
         '<div class="jload-track" dir="ltr">' +
           '<div class="jload-fill" style="width:' + Math.round(pct) + '%"></div>' +
         '</div>' +
-        (total ? '<div class="jload-count">' + Math.round(pct) + '%' +
-          ' · ' + Math.round(pct / 100 * total) + ' / ' + total + ' רשומות</div>' : '') +
+        (total ? '<div class="jload-count" dir="ltr">' + Math.round(pct / 100 * total) + ' / ' + total +
+          ' רשומות · ' + Math.round(pct) + '%</div>' : '') +
       '</div>';
   }
 
@@ -2980,6 +2993,27 @@ function refreshSettingsView() {
 
 function clearRAM() {
   allRows = []; journalRows = []; _journalLoading = false;
+  // Clear rendered values in stats/history tabs
+  ['s-flights','s-landings','s-pic','s-dual','s-total',
+   'h-flights','h-landings','h-pic','h-dual','h-total'].forEach(id => {
+    if (el(id)) el(id).textContent = '—';
+  });
+  ['barXC','barLocal','barPic','barDual'].forEach(id => {
+    if (el(id)) el(id).style.width = '0%';
+  });
+  ['barXCVal','barLocalVal','barPicVal','barDualVal'].forEach(id => {
+    if (el(id)) el(id).textContent = '—';
+  });
+  if (el('acTypeBody')) el('acTypeBody').innerHTML =
+    '<div class="stats-empty" style="padding:10px 0;font-size:12px;"><div>לחץ רענן כדי לטעון</div></div>';
+  if (el('yearlyBody')) el('yearlyBody').innerHTML =
+    '<div class="stats-empty" style="padding:20px 0;"><div>לחץ רענן כדי לטעון</div></div>';
+  if (el('monthlyChartBody')) el('monthlyChartBody').innerHTML =
+    '<div class="stats-empty" style="padding:16px 0;font-size:12px;"><div>לחץ רענן כדי לטעון</div></div>';
+  if (el('searchResults')) el('searchResults').innerHTML =
+    '<div class="stats-empty" style="padding:24px 0;text-align:center;">' +
+    '<div style="font-size:32px;margin-bottom:8px;">✈️</div>' +
+    '<div style="font-size:13px;color:var(--text2);">הזן מילת חיפוש</div></div>';
   const msg = el('ramClearedMsg');
   if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display='none', 3000); }
 }
