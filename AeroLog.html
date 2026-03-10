@@ -1876,17 +1876,18 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchConnectedName() {
-  const url = localStorage.getItem('gasUrl');
+  const url = getUrl();
   if (!url) return;
   try {
-    const r = await fetch(url + '?action=name');
-    const d = await r.json();
+    const r = await fetch(url + '?action=name', {redirect: 'follow'});
+    const text = await r.text();
+    const d = JSON.parse(text);
     if (d.name) {
       const badge = el('connBadge');
       badge.textContent = d.name;
       badge.classList.add('visible');
     }
-  } catch(e) {}
+  } catch(e) { console.log('name fetch error:', e); }
 }
 
 // ═══════════════════════════════════════════
