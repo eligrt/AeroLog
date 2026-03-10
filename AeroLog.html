@@ -2783,12 +2783,21 @@ function renderMonthly() {
     byMonth[mo].dual += parseHM(r.dual || '0:00');
   });
 
-  const totals      = byMonth.map(m => m.pic + m.dual);
-  const pastTotals  = totals.slice(0, curMonth + 1).filter(t => t > 0);
-  const avgMin      = pastTotals.length
-    ? Math.round(pastTotals.reduce((a,b)=>a+b,0) / pastTotals.length) : 0;
-  const yearTotal   = totals.reduce((a,b)=>a+b,0);
-  const estimateMin = avgMin * 12;
+  const totals    = byMonth.map(m => m.pic + m.dual);
+  const yearTotal = totals.reduce((a,b)=>a+b,0);
+
+  // ── Weighted average: completed months count as 1.0, current month weighted by % of days elapsed ──
+  const today        = new Date();
+  const daysInCurMo  = new Date(curYear, curMonth + 1, 0).getDate(); // total days in current month
+  const dayOfCurMo   = today.getDate();                               // today's day number
+  const curMonthWeight = dayOfCurMo / daysInCurMo;                   // e.g. 10/31 = 0.32
+
+  // Sum: completed months (0..curMonth-1) + current month weighted
+  const completedSum = totals.slice(0, curMonth).reduce((a,b)=>a+b,0);
+  const totalSum     = completedSum + totals[curMonth];
+  const divisor      = curMonth + curMonthWeight; // e.g. 2 + 0.32 = 2.32
+  const avgMin       = divisor > 0 ? Math.round(totalSum / divisor) : 0;
+  const estimateMin  = avgMin * 12;
 
   // ── TWO SEPARATE AXES ──
   // Bar axis: covers monthly totals + avg (same scale as bars)
@@ -2844,6 +2853,13 @@ function renderMonthly() {
           width="${barW.toFixed(1)}" height="${bh.toFixed(1)}"
           fill="none" stroke="#a5b4fc" stroke-width="1.5" rx="2"/>`;
 
+    } else if (isCur) {
+      // Current month, no flights yet — show a slim glowing placeholder bar
+      const stubH = 6;
+      const stubY = chartH - stubH;
+      bars += `<rect x="${bx.toFixed(1)}" y="${stubY.toFixed(1)}"
+        width="${barW.toFixed(1)}" height="${stubH}"
+        fill="#3b82f640" stroke="#a5b4fc" stroke-width="1.5" rx="2"/>`;
     } else if (isFut) {
       bars += `<rect x="${bx.toFixed(1)}" y="2" width="${barW.toFixed(1)}"
         height="${(chartH-2).toFixed(1)}" fill="#ffffff05" rx="2"/>`;
@@ -2853,9 +2869,9 @@ function renderMonthly() {
     labels += '<text x="' + cx.toFixed(1) + '" y="' + (H-5).toFixed(1) + '"' +
       ' text-anchor="middle" font-size="9" fill="' + lblColor + '"' +
       ' font-weight="' + (isCur ? '700' : '400') + '">' + MONTHS[i] + '</text>';
-    // value above bar
-    if (total > 0) {
-      const valY = toBarY(total) - 3;
+    // value above bar — show 0:00 for current month even if empty
+    if (total > 0 || isCur) {
+      const valY = isCur && total === 0 ? chartH - 10 : toBarY(total) - 3;
       const valColor = isCur ? '#a5b4fc' : '#6b7280';
       labels += '<text x="' + cx.toFixed(1) + '" y="' + valY.toFixed(1) + '"' +
         ' text-anchor="middle" font-size="7.5" fill="' + valColor + '" font-family="monospace">' +
