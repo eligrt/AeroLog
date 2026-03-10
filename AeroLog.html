@@ -167,6 +167,7 @@ body::before {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 16px; background: var(--surface);
   border-bottom: 1px solid var(--border);
+  gap: 8px;
 }
 .top-title {
   font-size: 14px; font-weight: 700; color: var(--text1);
@@ -174,15 +175,16 @@ body::before {
 }
 .top-date {
   font-size: 11px; color: #7aa8cc; font-family: var(--mono);
+  flex-shrink: 0;
 }
 .conn-badge {
   font-size: 11px; color: #e2f0ff;
   font-family: var(--mono); font-weight: 600;
   background: #1a3a5c; border: 1px solid #3b6ea8;
   border-radius: 20px; padding: 3px 10px;
-  white-space: nowrap; max-width: 220px;
+  white-space: nowrap; max-width: 200px;
   overflow: hidden; text-overflow: ellipsis;
-  display: none;
+  display: none; flex-shrink: 1; min-width: 0;
 }
 .conn-badge.visible { display: inline-block; }
 .conn-badge::before { content: "🟢 "; }
@@ -1980,16 +1982,15 @@ async function fetchConnectedName() {
   const url = getUrl();
   if (!url) return;
   const badge = el('connBadge');
-  // Show fallback immediately so user knows they are connected
   badge.textContent = '✓ מחובר';
   badge.classList.add('visible');
   try {
     const r = await fetch(url + '?action=name');
     const text = await r.text();
-    console.log('name response:', text);
     const d = JSON.parse(text);
     if (d && d.name) {
       badge.textContent = d.name;
+      badge.title = d.name; // tooltip for truncated names
     }
   } catch(e) {
     console.log('name fetch error:', e);
@@ -2992,6 +2993,7 @@ function refreshSettingsView() {
 }
 
 function clearRAM() {
+  if (!confirm('לנקות את הנתונים מהזיכרון?\nהנתונים ב-Google Sheets לא יימחקו — רק הטעינה המקומית תתאפס.')) return;
   allRows = []; journalRows = []; _journalLoading = false;
   // Clear rendered values in stats/history tabs
   ['s-flights','s-landings','s-pic','s-dual','s-total',
