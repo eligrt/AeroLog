@@ -1876,7 +1876,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
     <div class="card" style="margin-bottom:10px;">
       <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">חיפוש בטיסות</span></div>
       <div class="card-body" style="padding:14px 16px;gap:10px;">
-        <div class="search-hint">חפש לפי מקום, נושא, תרגיל או כל מילה שזכורה מטיסה קודמת</div>
+        <div class="search-hint">החיפוש מתבצע בתיאור הטיסה ובלקחים בלבד — לא בתאריך, מטוס או שעות.<br><span style="color:var(--text3);font-size:11px;">דוגמאות: ״נחיתה״, ״ניווט״, ״מגידו״, ״רוח צד״...</span></div>
         <div class="search-input-wrap">
           <span class="search-icon" style="right:auto;left:10px;">🔍</span>
           <input type="text" id="journalSearch" class="search-input" placeholder="למשל: טל שחר, מגידו, הקפות, ניווט..." dir="rtl"
@@ -1957,7 +1957,10 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 
     <!-- GAS URL -->
     <div class="card" style="margin-bottom:10px;">
-      <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">חיבור ל-Google Sheets</span></div>
+      <div class="card-head" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;"><span class="card-icon">🔗</span><span class="card-title">חיבור ל-Google Sheets</span></div>
+        <button onclick="showGasInfo()" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:22px;height:22px;color:var(--accent2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="מה זה Apps Script?">i</button>
+      </div>
       <div class="card-body" style="gap:10px;">
         <div style="font-size:12px;color:var(--text2);line-height:1.6;direction:rtl;">
           כתובת ה-Apps Script המחוברת כרגע:
@@ -1977,7 +1980,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       <div class="card-body" style="gap:10px;">
         <div style="font-size:12px;color:var(--text2);line-height:1.6;direction:rtl;">
           הנתונים נטענים מ-Google Sheets ונשמרים זמנית בזיכרון המכשיר (RAM).<br>
-          ניקוי הזיכרון <strong style="color:var(--emerald)">לא מוחק</strong> שום דבר מה-Sheets — רק מאלץ טעינה מחדש בפעם הבאה.
+          ניקוי הזיכרון <strong style="color:var(--emerald)">לא מוחק</strong> שום דבר מה-Google Sheets — רק מאלץ טעינה מחדש בפעם הבאה.
         </div>
         <button class="settings-action-btn" onclick="clearRAM()">
           🧹 נקה נתונים מהזיכרון
@@ -2004,7 +2007,43 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 
   </div><!-- /view-settings -->
 
-  <div class="app-footer" dir="ltr">built by eligrt with ✈ &amp; ☕</div>
+  <div class="app-footer" dir="ltr">built by eligrt</div>
+
+<!-- ── GAS INFO MODAL ── -->
+<div id="gasInfoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;
+  align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;
+    padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px #000a;direction:rtl;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);">🔗 מה זה Apps Script?</div>
+      <button onclick="closeGasInfo()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8;display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <strong style="color:var(--text);">מה זה?</strong><br>
+        Apps Script הוא שירות של Google המאפשר לאפליקציות חיצוניות לקרוא ולכתוב ל-Google Sheets שלך.
+      </div>
+      <div>
+        <strong style="color:var(--text);">למה צריך את זה?</strong><br>
+        AeroLog שומר את הטיסות שלך ב-Google Sheets האישי שלך. ה-Script הוא ה״גשר״ בין האפליקציה לגיליון.
+      </div>
+      <div>
+        <strong style="color:var(--text);">איך מקבלים את הכתובת?</strong>
+        <ol style="margin:6px 0 0 0;padding-right:16px;display:flex;flex-direction:column;gap:4px;">
+          <li>פתח את Google Sheets שלך</li>
+          <li>תפריט <strong>Extensions → Apps Script</strong></li>
+          <li>הדבק את קוד ה-GAS ושמור</li>
+          <li>לחץ <strong>Deploy → New Deployment</strong></li>
+          <li>העתק את הכתובת והדבק כאן</li>
+        </ol>
+      </div>
+      <div style="font-size:11px;color:var(--text3);background:var(--raised);border-radius:6px;padding:8px 10px;">
+        🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /page -->
 
 <script>
@@ -3182,6 +3221,16 @@ async function triggerInstall() {
       }
     }, 800);
   }
+}
+
+
+function showGasInfo() {
+  const m = el('gasInfoModal');
+  m.style.display = 'flex';
+  m.onclick = e => { if (e.target === m) closeGasInfo(); };
+}
+function closeGasInfo() {
+  el('gasInfoModal').style.display = 'none';
 }
 
 </script>
