@@ -2002,14 +2002,9 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       </div>
     </div>
 
-    <div class="app-footer" dir="ltr">built by eligrt with ✈ &amp; ☕</div>
-
-
-    <div class="app-footer" dir="ltr">built by eligrt with ✈ &amp; ☕</div>
-
-  
   </div><!-- /view-settings -->
 
+  <div class="app-footer" dir="ltr">built by eligrt with ✈ &amp; ☕</div>
 </div><!-- /page -->
 
 <script>
@@ -3175,6 +3170,17 @@ async function triggerInstall() {
   if (result && result.outcome === 'accepted') {
     _installPrompt = null;
     updateInstallUI();
+    // Close browser tab after install — nudges user to launch from home screen
+    setTimeout(() => {
+      window.close();
+      // window.close() only works if the tab was opened by script — show message as fallback
+      const btn = el('btnInstall');
+      if (btn) {
+        btn.textContent = '✅ מותקן! סגור טאב זה והפעל מהמסך הבית';
+        btn.style.background = 'linear-gradient(135deg, #065f46, #047857)';
+        btn.onclick = null;
+      }
+    }, 800);
   }
 }
 
