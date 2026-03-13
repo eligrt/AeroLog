@@ -566,7 +566,7 @@ select {
   overflow: hidden;
 }
 .yr-pic  { background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .7s; }
-.yr-dual { background: linear-gradient(90deg, #0e7490, var(--cyan));          transition: width .7s; flex: 1; }
+.yr-dual { background: linear-gradient(90deg, #0e7490, var(--cyan));          transition: width .7s; }
 
 .yr-breakdown {
   display: flex;
@@ -1755,16 +1755,16 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 <!-- ── TOP HEADER ── -->
 <div class="top-header">
   <span class="conn-badge" id="connBadge"></span>
-  <span class="top-date" id="headerDate"></span><span style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:8px;">v0.96</span>
+  <span class="top-date" id="headerDate"></span><span style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:8px;">v0.99</span><span id="syncStamp" style="display:none;font-size:10px;color:var(--text3);font-family:var(--mono);margin-right:6px;border-right:1px solid var(--border);padding-right:8px;">עודכן —</span>
 </div>
 
 <!-- ── TAB BAR ── -->
 <div class="tab-bar">
-  <div class="tab active" id="tab-log"     onclick="switchTab('log')">✍️ רישום טיסה</div>
-  <div class="tab"        id="tab-stats"   onclick="switchTab('stats')">📊 סיכום שעות</div>
-  <div class="tab"        id="tab-history" onclick="switchTab('history')">📅 מבט רב שנתי</div>
-  <div class="tab"        id="tab-search"  onclick="switchTab('search')">🔎 יומן</div>
-  <div class="tab"        id="tab-settings" onclick="switchTab('settings')">⚙️ הגדרות</div>
+  <div class="tab active" id="tab-log"      onclick="switchTab('log')">רישום טיסה</div>
+  <div class="tab"        id="tab-stats"    onclick="switchTab('stats')">סיכום שעות</div>
+  <div class="tab"        id="tab-history"  onclick="switchTab('history')">מבט רב שנתי</div>
+  <div class="tab"        id="tab-search"   onclick="switchTab('search')">יומן</div>
+  <div class="tab"        id="tab-settings" onclick="switchTab('settings')">הגדרות</div>
 </div>
 
 <div class="page">
@@ -1894,10 +1894,9 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
               <div class="land-chips-wrap">
                 <div class="land-hint-center">בחר מספר נחיתות או הזן ידנית</div>
                 <div class="land-chips">
-                <button type="button" class="land-chip" onclick="setLandings(1)">1</button>
                 <button type="button" class="land-chip" onclick="setLandings(2)">2</button>
                 <button type="button" class="land-chip" onclick="setLandings(4)">4</button>
-                <button type="button" class="land-chip" onclick="setLandings(6)">6</button>
+                <button type="button" class="land-chip" onclick="setLandings(8)">8</button>
                 <button type="button" class="land-chip" onclick="setLandings(12)">12</button>
                 </div>
               </div><!-- /land-chips-wrap -->
@@ -2652,15 +2651,15 @@ function updatePeriodNote() {
     month: 'חודש נוכחי — ' + ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'][now.getMonth()],
     q:     'רבעון ' + (Math.floor(now.getMonth()/3)+1) + ' — ' + now.getFullYear(),
     year:  'שנת ' + now.getFullYear(),
-    d30:   () => { const f=new Date(now); f.setDate(f.getDate()-30); return fmt(f)+' – '+fmt(now); },
-    d90:   () => { const f=new Date(now); f.setDate(f.getDate()-90); return fmt(f)+' – '+fmt(now); },
+    d30:   () => { const f=new Date(now); f.setDate(f.getDate()-30); return fmt(f)+' — '+fmt(now); },
+    d90:   () => { const f=new Date(now); f.setDate(f.getDate()-90); return fmt(f)+' — '+fmt(now); },
   };
 
   const v = labels[activePeriod];
   if (v) {
-    note.textContent = '📅 ' + (typeof v === 'function' ? v() : v);
+    note.textContent = (typeof v === 'function' ? v() : v);
     note.style.display = 'block';
-    note.style.cssText = 'display:block;font-size:11px;color:var(--text3);padding:4px 0 8px;text-align:center;direction:rtl;';
+    note.style.cssText = 'display:block;font-size:11px;color:var(--text3);padding:4px 0 8px;text-align:center;direction:ltr;';
   } else {
     note.style.display = 'none';
   }
@@ -2816,6 +2815,7 @@ async function loadStats() {
     renderFlightCards(allRows); // initial render with all rows
     setLB(100, 'נטען! ' + allRows.length + ' טיסות');
     setTimeout(hideLB, 1000);
+    stampSync();
 
   } catch(err) {
     cancelAnimationFrame(_lbAnim);
@@ -3088,13 +3088,13 @@ function renderAcTypes(rows) {
         </div>
         <div class="yr-track">
           <div class="yr-fill" style="width:100%">
-            <div class="yr-pic"  style="width:${picPct}%"></div>
             <div class="yr-dual" style="width:${dualPct}%"></div>
+            <div class="yr-pic"  style="width:${picPct}%"></div>
           </div>
         </div>
         <div class="ac-type-breakdown">
-          <span class="ac-type-b pic">✈ PIC ${toHM(d.pic)} (${picPct}%)</span>
           <span class="ac-type-b dual">🎓 Dual ${toHM(d.dual)} (${dualPct}%)</span>
+          <span class="ac-type-b pic">✈ PIC ${toHM(d.pic)} (${picPct}%)</span>
         </div>
       </div>`;
   }).join('');
@@ -3135,13 +3135,13 @@ function renderYearly() {
         </div>
         <div class="yr-track">
           <div class="yr-fill" style="width:${trackPct}%">
-            <div class="yr-pic"  style="width:${picPct}%"></div>
             <div class="yr-dual" style="width:${dualPct}%"></div>
+            <div class="yr-pic"  style="width:${picPct}%"></div>
           </div>
         </div>
         <div class="yr-breakdown">
-          <span class="yr-b pic">✈ PIC ${toHM(d.pic)} (${picPct}%)</span>
           <span class="yr-b dual">🎓 Dual ${toHM(d.dual)} (${dualPct}%)</span>
+          <span class="yr-b pic">✈ PIC ${toHM(d.pic)} (${picPct}%)</span>
         </div>
       </div>`;
   }).join('');
@@ -3627,6 +3627,16 @@ async function archiveFlight(e, idx) {
   }
 }
 
+
+function stampSync() {
+  const stamp = el('syncStamp');
+  if (!stamp) return;
+  const now = new Date();
+  const hh  = now.getHours().toString().padStart(2,'0');
+  const mm  = now.getMinutes().toString().padStart(2,'0');
+  stamp.textContent = 'עודכן ' + hh + ':' + mm;
+  stamp.style.display = 'inline';
+}
 
 function refreshSettingsView() {
   const url = getUrl();
