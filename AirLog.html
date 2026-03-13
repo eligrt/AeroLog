@@ -1907,7 +1907,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 <!-- ── TOP HEADER ── -->
 <div class="top-header">
   <span class="conn-badge" id="connBadge"></span>
-  <span class="top-date" id="headerDate"></span><span style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:8px;">v0.130</span>
+  <span class="top-date" id="headerDate"></span><span style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-right:8px;">v0.131</span>
 </div>
 
 <!-- ── TAB BAR ── -->
@@ -3434,24 +3434,23 @@ function renderCurrency() {
   }
 
   // ── B. נוסע ביום ──
+  // iOS/Android-safe date normalize: strip time component if present
+  const normDate = d => (d || '').toString().slice(0, 10);
+
   const cutoff90    = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90);
   const cutoff90str = cutoff90.getFullYear() + '-' +
     String(cutoff90.getMonth()+1).padStart(2,'0') + '-' +
     String(cutoff90.getDate()).padStart(2,'0');
-  const paxRows     = allRows.filter(r => r.date && r.date >= cutoff90str);
+  const paxRows     = allRows.filter(r => normDate(r.date) >= cutoff90str);
   const paxLands    = paxRows.reduce((s,r) => s + parseLandings(r.landings), 0);
   const paxOk       = paxLands >= 3;
   const paxBody     = el('cur-pax-body');
   if (!paxOk) raiseAlert('red');
   if (paxBody) {
-    const sorted90   = [...paxRows].sort((a,b) => a.date.localeCompare(b.date));
-    const oldestDate = sorted90.length ? sorted90[0].date : null;
-    const newestDate = sorted90.length ? sorted90[sorted90.length-1].date : null;
-    const cls        = paxOk ? 'c-green' : 'c-red';
-    const statusTxt  = paxOk ? 'כשיר' : 'לא כשיר';
-    const rangeStr   = oldestDate && newestDate
-      ? `${fmt(oldestDate)} — ${fmt(newestDate)}`
-      : fmt(today) + ' (חלון 90 יום)';
+    // range always: cutoff90str → today
+    const rangeStr = `${fmt(cutoff90str)} — ${fmt(today)}`;
+    const cls       = paxOk ? 'c-green' : 'c-red';
+    const statusTxt = paxOk ? 'כשיר' : 'לא כשיר';
     paxBody.className = `cur-big-card ${cls}`;
     paxBody.innerHTML = `
       <div class="cur-card-row">
@@ -3481,7 +3480,9 @@ function renderCurrency() {
   const byAc = {};
   allRows.forEach(r => {
     const ac = r.acType || r.aircraft || '?';
-    if (!byAc[ac] || r.date > byAc[ac]) byAc[ac] = r.date;
+    const d  = normDate(r.date);
+    if (!d) return;
+    if (!byAc[ac] || d > byAc[ac]) byAc[ac] = d;
   });
   const acBody = el('cur-ac-body');
   if (acBody) {
