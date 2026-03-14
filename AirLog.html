@@ -240,7 +240,7 @@ body::before {
   white-space: nowrap; width: 110px;
   overflow: hidden; text-overflow: ellipsis;
   display: none; flex-shrink: 0;
-  align-items: center; gap: 6px;
+  align-items: center; justify-content: center; gap: 6px;
 }
 .conn-badge.visible { display: flex; }
 .conn-badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; display: inline-block; }
@@ -1462,7 +1462,7 @@ tbody td:first-child { color: var(--text); font-weight: 600; font-family: var(--
   display: flex; align-items: center; justify-content: center;
   transition: background .1s, color .1s;
 }
-.land-thermo-btn.minus:hover { background: #ef444418; color: #ef4444; }
+.land-thermo-btn.minus:hover { background: #34d39918; color: var(--emerald); }
 .land-thermo-btn.plus:hover  { background: #34d39918; color: var(--emerald); }
 .land-thermo-btn:active      { transform: scale(.88); }
 .land-thermo-display {
@@ -1633,8 +1633,11 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   cursor: pointer;
   transition: all .2s;
   display: flex; align-items: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
-.btn-edit-toggle:hover { border-color: var(--amber); color: var(--amber); }
+.btn-edit-toggle:hover { border-color: var(--accent); color: var(--accent2); }
+.btn-edit-toggle:focus { outline: none; }
 .btn-edit-toggle.active {
   background: #7f1d1d;
   border-color: #ef4444;
@@ -2621,7 +2624,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 
   </div><!-- /view-settings -->
 
-  <div class="app-footer" dir="ltr">built by eligrt · v1.06</div>
+  <div class="app-footer" dir="ltr">built by eligrt · v1.14</div>
 
 </div><!-- /page -->
 
@@ -2832,12 +2835,24 @@ function initDate() {
 //  DROPDOWNS
 // ═══════════════════════════════════════════
 function initDropdowns() {
-  [['fAcReg','fAcRegCustom'],['fAcType','fAcTypeCustom']].forEach(([s,c]) => {
-    el(s).addEventListener('change', function() {
-      const show = this.value === '__other__';
-      el(c).style.display = show ? 'block' : 'none';
-      el(c).required = show;
-    });
+  // fAcType: handle custom input + cross-filter regs
+  el('fAcType').addEventListener('change', function() {
+    const isOther = this.value === '__other__';
+    const custom = el('fAcTypeCustom');
+    custom.style.display = isOther ? 'block' : 'none';
+    custom.required = isOther;
+    // Cross-filter: update reg dropdown based on selected type
+    filterRegByType(isOther ? '' : this.value);
+  });
+
+  // fAcReg: handle custom input + cross-filter types
+  el('fAcReg').addEventListener('change', function() {
+    const isOther = this.value === '__other__';
+    const custom = el('fAcRegCustom');
+    custom.style.display = isOther ? 'block' : 'none';
+    custom.required = isOther;
+    // Cross-filter: update type dropdown based on selected reg
+    filterTypeByReg(isOther ? '' : this.value);
   });
 }
 
@@ -4127,28 +4142,89 @@ function setJournalAc(val) {
   searchJournal();
 }
 
+// Build aircraft lookup maps from history
+function buildAcMaps() {
+  const typeToRegs = {}; // acType → Set of aircraft callsigns
+  const regToTypes = {}; // aircraft → Set of acTypes
+  allRows.forEach(r => {
+    const t = r.acType || ''; const a = r.aircraft || '';
+    if (t && a) {
+      if (!typeToRegs[t]) typeToRegs[t] = new Set();
+      if (!regToTypes[a]) regToTypes[a] = new Set();
+      typeToRegs[t].add(a);
+      regToTypes[a].add(t);
+    }
+  });
+  return { typeToRegs, regToTypes };
+}
+
 function populateLogFormAcDropdowns() {
   const typeSel = el('fAcType');
   const regSel  = el('fAcReg');
   if (!typeSel || !regSel || !allRows.length) return;
 
-  const types = [...new Set(allRows.map(r => r.acType).filter(Boolean))].sort();
-  const regs  = [...new Set(allRows.map(r => r.aircraft).filter(Boolean))].sort();
+  const { typeToRegs, regToTypes } = buildAcMaps();
+  const allTypes = Object.keys(typeToRegs).sort();
+  const allRegs  = Object.keys(regToTypes).sort();
 
   const curType = typeSel.value;
   const curReg  = regSel.value;
 
   typeSel.innerHTML = '<option value="">— בחר —</option>' +
-    types.map(t => `<option value="${t}">${t}</option>`).join('') +
+    allTypes.map(t => `<option value="${t}">${t}</option>`).join('') +
     '<option value="__other__">אחר...</option>';
 
   regSel.innerHTML = '<option value="">— בחר —</option>' +
-    regs.map(r => `<option value="${r}">${r}</option>`).join('') +
+    allRegs.map(r => `<option value="${r}">${r}</option>`).join('') +
     '<option value="__other__">אחר...</option>';
 
-  // Restore previous selection if still valid
   if (curType) typeSel.value = curType;
   if (curReg)  regSel.value  = curReg;
+}
+
+function filterRegByType(selectedType) {
+  const regSel = el('fAcReg');
+  if (!regSel || !allRows.length) return;
+  const { typeToRegs, regToTypes } = buildAcMaps();
+  const allRegs = Object.keys(regToTypes).sort();
+  const curReg  = regSel.value;
+
+  if (!selectedType || selectedType === '__other__') {
+    // Show all regs
+    regSel.innerHTML = '<option value="">— בחר —</option>' +
+      allRegs.map(r => `<option value="${r}">${r}</option>`).join('') +
+      '<option value="__other__">אחר...</option>';
+  } else {
+    const validRegs = [...(typeToRegs[selectedType] || [])].sort();
+    regSel.innerHTML = '<option value="">— בחר —</option>' +
+      validRegs.map(r => `<option value="${r}">${r}</option>`).join('') +
+      '<option value="__other__">אחר...</option>';
+    // If only one reg option → auto-select it
+    if (validRegs.length === 1) regSel.value = validRegs[0];
+  }
+  // Restore previous reg if still valid in filtered list
+  if (curReg && [...regSel.options].find(o => o.value === curReg)) regSel.value = curReg;
+}
+
+function filterTypeByReg(selectedReg) {
+  const typeSel = el('fAcType');
+  if (!typeSel || !allRows.length) return;
+  const { typeToRegs, regToTypes } = buildAcMaps();
+  const allTypes = Object.keys(typeToRegs).sort();
+  const curType  = typeSel.value;
+
+  if (!selectedReg || selectedReg === '__other__') {
+    typeSel.innerHTML = '<option value="">— בחר —</option>' +
+      allTypes.map(t => `<option value="${t}">${t}</option>`).join('') +
+      '<option value="__other__">אחר...</option>';
+  } else {
+    const validTypes = [...(regToTypes[selectedReg] || [])].sort();
+    typeSel.innerHTML = '<option value="">— בחר —</option>' +
+      validTypes.map(t => `<option value="${t}">${t}</option>`).join('') +
+      '<option value="__other__">אחר...</option>';
+    if (validTypes.length === 1) typeSel.value = validTypes[0];
+  }
+  if (curType && [...typeSel.options].find(o => o.value === curType)) typeSel.value = curType;
 }
 
 function populateJournalAcPills() {
@@ -4436,6 +4512,9 @@ self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => n
 // ═══════════════════════════════════════════
 
 function toggleEditMode() {
+  // Blur immediately to prevent mobile sticky focus/amber state
+  const btn = el('btnEditMode');
+  if (btn) btn.blur();
   if (!_editMode) {
     // Turning ON — confirm first
     if (!confirm('⚠️ מצב עריכה\n\nבמצב זה תוכל לארכב טיסות מהרשימה.\nהטיסה לא תימחק — היא תועבר לטאב "Archive" בגיליון.\n\nלהמשיך למצב עריכה?')) return;
@@ -4639,6 +4718,10 @@ function populateSettingsAcDropdowns() {
   const types = [...new Set(allRows.map(r => r.acType).filter(Boolean))].sort();
   const regs  = [...new Set(allRows.map(r => r.aircraft).filter(Boolean))].sort();
 
+  // Always hide custom inputs first
+  const tc = el('setDefAcTypeCustom'); if (tc) { tc.style.display = 'none'; tc.value = ''; }
+  const rc = el('setDefAcRegCustom');  if (rc) { rc.style.display = 'none'; rc.value = ''; }
+
   typesSel.innerHTML = '<option value="">— בחר —</option>' +
     types.map(t => `<option value="${t}"${t === savedType ? ' selected' : ''}>${t}</option>`).join('') +
     '<option value="__other__">אחר...</option>';
@@ -4647,28 +4730,77 @@ function populateSettingsAcDropdowns() {
     regs.map(r => `<option value="${r}"${r === savedReg ? ' selected' : ''}>${r}</option>`).join('') +
     '<option value="__other__">אחר...</option>';
 
-  // Show custom inputs if saved value not in list
+  // Show custom input only if saved value not in history list
   if (savedType && !types.includes(savedType)) {
     typesSel.value = '__other__';
-    const c = el('setDefAcTypeCustom');
-    if (c) { c.style.display = 'block'; c.value = savedType; }
+    if (tc) { tc.style.display = 'block'; tc.value = savedType; }
+  } else if (savedType) {
+    // Apply cross-filter to reg dropdown based on saved type
+    filterSettingsRegByType(savedType);
   }
   if (savedReg && !regs.includes(savedReg)) {
     regsSel.value = '__other__';
-    const c = el('setDefAcRegCustom');
-    if (c) { c.style.display = 'block'; c.value = savedReg; }
+    if (rc) { rc.style.display = 'block'; rc.value = savedReg; }
   }
 }
 
 function onSetAcTypeChange() {
   const sel = el('setDefAcType');
   const custom = el('setDefAcTypeCustom');
-  if (custom) custom.style.display = sel.value === '__other__' ? 'block' : 'none';
+  const isOther = sel.value === '__other__';
+  if (custom) custom.style.display = isOther ? 'block' : 'none';
+  // Cross-filter reg dropdown in settings
+  filterSettingsRegByType(isOther ? '' : sel.value);
 }
 function onSetAcRegChange() {
   const sel = el('setDefAcReg');
   const custom = el('setDefAcRegCustom');
-  if (custom) custom.style.display = sel.value === '__other__' ? 'block' : 'none';
+  const isOther = sel.value === '__other__';
+  if (custom) custom.style.display = isOther ? 'block' : 'none';
+  // Cross-filter type dropdown in settings
+  filterSettingsTypeByReg(isOther ? '' : sel.value);
+}
+
+function filterSettingsRegByType(selectedType) {
+  const regSel = el('setDefAcReg');
+  if (!regSel || !allRows.length) return;
+  const { typeToRegs, regToTypes } = buildAcMaps();
+  const allRegs = Object.keys(regToTypes).sort();
+  const curReg  = regSel.value;
+  const savedReg = localStorage.getItem('airlog_def_ac_reg') || '';
+
+  const validRegs = (!selectedType || selectedType === '__other__')
+    ? allRegs
+    : [...(typeToRegs[selectedType] || [])].sort();
+
+  regSel.innerHTML = '<option value="">— בחר —</option>' +
+    validRegs.map(r => `<option value="${r}">${r}</option>`).join('') +
+    '<option value="__other__">אחר...</option>';
+
+  if (validRegs.length === 1) regSel.value = validRegs[0];
+  else if (curReg && validRegs.includes(curReg)) regSel.value = curReg;
+  else if (savedReg && validRegs.includes(savedReg)) regSel.value = savedReg;
+}
+
+function filterSettingsTypeByReg(selectedReg) {
+  const typeSel = el('setDefAcType');
+  if (!typeSel || !allRows.length) return;
+  const { typeToRegs, regToTypes } = buildAcMaps();
+  const allTypes = Object.keys(typeToRegs).sort();
+  const curType  = typeSel.value;
+  const savedType = localStorage.getItem('airlog_def_ac_type') || '';
+
+  const validTypes = (!selectedReg || selectedReg === '__other__')
+    ? allTypes
+    : [...(regToTypes[selectedReg] || [])].sort();
+
+  typeSel.innerHTML = '<option value="">— בחר —</option>' +
+    validTypes.map(t => `<option value="${t}">${t}</option>`).join('') +
+    '<option value="__other__">אחר...</option>';
+
+  if (validTypes.length === 1) typeSel.value = validTypes[0];
+  else if (curType && validTypes.includes(curType)) typeSel.value = curType;
+  else if (savedType && validTypes.includes(savedType)) typeSel.value = savedType;
 }
 
 function saveDefaultAc() {
@@ -4701,13 +4833,11 @@ function applyDefaultAcToForm() {
     if (!val) return;
     const sel = el(selId);
     if (!sel) return;
-    // Check if value exists as option
     const opt = [...sel.options].find(o => o.value === val);
     if (opt) {
       sel.value = val;
       const c = el(customId); if (c) c.style.display = 'none';
     } else {
-      // Add as custom option if not in list
       const newOpt = document.createElement('option');
       newOpt.value = val; newOpt.textContent = val;
       sel.insertBefore(newOpt, sel.querySelector('option[value="__other__"]'));
@@ -4715,8 +4845,11 @@ function applyDefaultAcToForm() {
       const c = el(customId); if (c) c.style.display = 'none';
     }
   }
+
   applyToSelect('fAcType', 'fAcTypeCustom', savedType);
-  applyToSelect('fAcReg',  'fAcRegCustom',  savedReg);
+  // Filter regs based on the saved type before applying reg default
+  if (savedType && savedType !== '__other__') filterRegByType(savedType);
+  applyToSelect('fAcReg', 'fAcRegCustom', savedReg);
 }
 
 function handleInstallClick() {
