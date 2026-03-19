@@ -1815,7 +1815,6 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   border-color: #ef4444;
   color: #fca5a5;
   box-shadow: 0 0 0 2px #ef444430;
-  transition: background .2s, border-color .2s, color .2s;
 }
 
 .edit-banner {
@@ -2722,7 +2721,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.997<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.997.1<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -4983,9 +4982,12 @@ async function toggleEditMode() {
     const btn2 = el('btnEditMode');
     btn2.classList.remove('active');
     btn2.textContent = '✏️ מצב עריכה';
-    // Break sticky hover on mobile by briefly disabling pointer events
+    btn2.style.background    = 'var(--raised)';
+    btn2.style.borderColor   = 'var(--accent)';
+    btn2.style.color         = 'var(--accent2)';
+    btn2.style.boxShadow     = 'none';
     btn2.style.pointerEvents = 'none';
-    setTimeout(() => { btn2.style.pointerEvents = ''; }, 300);
+    setTimeout(() => { btn2.style.pointerEvents = ''; }, 400);
   }
 }
 
