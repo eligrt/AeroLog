@@ -1799,7 +1799,6 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: all .2s;
   display: flex; align-items: center; gap: 6px;
   -webkit-tap-highlight-color: transparent;
   outline: none;
@@ -1816,6 +1815,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   border-color: #ef4444;
   color: #fca5a5;
   box-shadow: 0 0 0 2px #ef444430;
+  transition: background .2s, border-color .2s, color .2s;
 }
 
 .edit-banner {
@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.996<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.997<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
