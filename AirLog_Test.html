@@ -2721,7 +2721,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.997.4T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.997.2T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2775,22 +2775,6 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
 const el  = id => document.getElementById(id);
 const pad = n  => String(n).padStart(2, '0');
 const toHM = m => `${Math.floor(m/60)}:${pad(m%60)}`;
-
-// iOS-safe GET — uses XHR which handles GAS redirects better than fetch on Safari
-function xhrGet(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.timeout = 15000;
-    xhr.onload = () => {
-      try { resolve(JSON.parse(xhr.responseText)); }
-      catch(e) { reject(new Error('parse error: ' + xhr.responseText)); }
-    };
-    xhr.onerror   = () => reject(new Error('network error'));
-    xhr.ontimeout = () => reject(new Error('timeout'));
-    xhr.send();
-  });
-}
 
 // ═══════════════════════════════════════════
 //  SETUP / URL MANAGEMENT
@@ -2854,7 +2838,8 @@ async function saveSetup() {
   // Check 2 — connect to sheet
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
-    const data = await xhrGet(u + '?action=name');
+    const res  = await fetch(u + '?action=name');
+    const data = await res.json();
     if (!data || !data.name) throw new Error('invalid response');
     setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
 
@@ -2877,8 +2862,7 @@ async function saveSetup() {
 
   } catch(e) {
     setCheck('setupCheck2', 'err', 'לא הצלחנו להתחבר לגיליון');
-    const errDetail = (e && e.message) ? e.message : String(e);
-    el('setupErrMsg').textContent = 'שגיאה: ' + errDetail;
+    el('setupErrMsg').textContent = (e && e.message) ? e.message : String(e);
     el('setupErrMsg').style.display = 'block';
     btn.disabled = false;
     btn.style.opacity = '1';
@@ -3004,7 +2988,8 @@ async function obConnectWithUrl(url) {
 
   try {
     // Validate URL by calling ?action=name
-    const data = await xhrGet(url + '?action=name');
+    const res = await fetch(url + '?action=name');
+    const data = await res.json();
 
     if (!data || !data.name) throw new Error('Invalid response');
 
@@ -3107,7 +3092,9 @@ async function fetchConnectedName() {
   badge.textContent = '✓ מחובר';
   badge.classList.add('visible');
   try {
-    const d = await xhrGet(url + '?action=name');
+    const r = await fetch(url + '?action=name');
+    const text = await r.text();
+    const d = JSON.parse(text);
     if (d && d.name) {
       // Strip common prefixes like "AirLog - " or "AeroLog - "
       const name = d.name.replace(/^(air|aero)log\s*[-–]\s*/i, '').trim() || d.name;
@@ -3388,7 +3375,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const res  = await fetch(gasUrl, { method:'POST', redirect:'follow', body: JSON.stringify(payload) });
+      const res  = await fetch(gasUrl, { method:'POST', body: JSON.stringify(payload) });
       const text = await res.text();
       if (text.includes('success') || res.ok) {
         form.style.display = 'none';
@@ -3667,7 +3654,8 @@ async function loadStats() {
   // Pre-fetch count for real progress
   setLB(5, 'מתחבר לשרת...', '');
   try {
-    var cj   = await xhrGet(gasUrl + '?action=count');
+    var cr   = await fetch(gasUrl + '?action=count');
+    var cj   = await cr.json();
     _totalCount = cj.count || 0;
     if (_totalCount) setLB(12, 'נמצאו ' + _totalCount + ' טיסות — טוען...');
   } catch(e) { /* continue without count */ }
@@ -3687,9 +3675,10 @@ async function loadStats() {
   _lbAnim = requestAnimationFrame(_lbTick);
 
   try {
-    const json = await xhrGet(gasUrl + '?action=getFlights&lean=1');
+    const res  = await fetch(gasUrl + '?action=getFlights&lean=1');
     cancelAnimationFrame(_lbAnim);
     setLB(95, 'מעבד נתונים...' + (_totalCount ? ' · ' + _totalCount + '/' + _totalCount : ''));
+    const json = await res.json();
     allRows    = (json.rows || json.flights || []).filter(r => r.date);
     updateFlightNum();
     journalRows = [];
@@ -3768,9 +3757,10 @@ async function loadJournal() {
   animFrame = requestAnimationFrame(animateProgress);
 
   try {
-    const json = await xhrGet(gasUrl + '?action=getFlights&lean=0');
+    const res  = await fetch(gasUrl + '?action=getFlights&lean=0');
     cancelAnimationFrame(animFrame);
     setProgress(92, 'מעבד נתונים...');
+    const json = await res.json();
     journalRows = (json.rows || json.flights || []).filter(r => r.date);
     _journalLoading = false;
     setProgress(100, 'מוכן!');
@@ -4954,7 +4944,12 @@ if ('serviceWorker' in navigator) {
   const sw = `
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response(''))));
+self.addEventListener('fetch', e => {
+  if (e.request.url.startsWith('https://script.google.com') || 
+      e.request.url.startsWith('https://fonts.googleapis.com') ||
+      e.request.url.startsWith('https://fonts.gstatic.com')) return;
+  e.respondWith(fetch(e.request).catch(() => new Response('')));
+});
 `;
   const blob = new Blob([sw], {type: 'application/javascript'});
   const swUrl = URL.createObjectURL(blob);
@@ -5049,7 +5044,6 @@ async function archiveFlight(e, idx) {
   try {
     const res  = await fetch(gasUrl, {
       method: 'POST',
-      redirect: 'follow',
       body: JSON.stringify({ action: 'archive', rowId: row.rowId || row.timestamp || row.date + '_' + (row.aircraft||'') })
     });
     const text = await res.text();
@@ -5510,7 +5504,7 @@ function createNewSheet() {
 <div id="setupOverlay">
   <div class="setup-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <div class="setup-title" style="margin-bottom:0;">✈ הגדרה ראשונית</div>
+      <div class="setup-title" style="margin-bottom:0;">✈ הגדרה ראשונית <span style="font-size:10px;font-weight:400;color:var(--text3);font-family:var(--mono);">v1.997.2T</span></div>
       <button id="setupCloseBtn" onclick="closeSetup()" style="display:none;background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">×</button>
     </div>
     <div class="setup-sub">
