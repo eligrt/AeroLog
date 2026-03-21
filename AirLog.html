@@ -172,7 +172,8 @@ body::before {
   width: 220px; height: 220px;
   border-radius: 0;
   margin-bottom: 22px;
-  overflow: hidden;
+  background: #060e18;
+  mix-blend-mode: normal;
 }
 .splash-title {
   font-family: var(--sans); font-size: 30px; font-weight: 700;
@@ -2578,7 +2579,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       <div id="setupReturnPasteFallback" style="display:none;margin-top:10px;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-align:center;">לא הצלחנו לקרוא את הלוח — הדבק את הכתובת ידנית:</div>
         <input type="text" id="setupReturnPasteInput" dir="ltr"
-          placeholder="https://script.google.com/macros/s/.../exec"
+          placeholder="📋 הדבק כאן..."
           style="width:100%;background:var(--raised);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:11px;padding:10px 12px;outline:none;"
           oninput="setupReturnOnPaste(this.value)">
       </div>
@@ -2721,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.997.1<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.998<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2786,7 +2787,7 @@ function saveUrl(u){ localStorage.setItem(LS_KEY, u.trim()); }
 
 function openSetup() {
   el('setupUrl').value = '';
-  el('setupUrl').placeholder = 'https://script.google.com/macros/s/.../exec';
+  el('setupUrl').placeholder = '📋 הדבק כאן...';
   el('setupUrl').classList.remove('err');
   el('setupChecks').style.display = 'none';
   el('setupErrMsg').style.display = 'none';
@@ -2838,7 +2839,10 @@ async function saveSetup() {
   // Check 2 — connect to sheet
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
-    const res  = await fetch(u + '?action=name');
+    const res  = await fetch(u + '?action=name', {
+      credentials: 'omit',
+      cache: 'no-store'
+    });
     const data = await res.json();
     if (!data || !data.name) throw new Error('invalid response');
     setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
@@ -4944,7 +4948,12 @@ if ('serviceWorker' in navigator) {
   const sw = `
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response(''))));
+self.addEventListener('fetch', e => {
+  if (e.request.url.startsWith('https://script.google.com') || 
+      e.request.url.startsWith('https://fonts.googleapis.com') ||
+      e.request.url.startsWith('https://fonts.gstatic.com')) return;
+  e.respondWith(fetch(e.request).catch(() => new Response('')));
+});
 `;
   const blob = new Blob([sw], {type: 'application/javascript'});
   const swUrl = URL.createObjectURL(blob);
@@ -5490,10 +5499,14 @@ function createNewSheet() {
   </div>
   <div class="splash-concept">Where aviation meets Google Sheets</div>
   <div class="splash-tagline">Your flights. Your logbook. Your data.</div>
-  <div class="splash-bar-wrap" dir="ltr">
+  <div class="splash-bar-wrap" dir="ltr" style="margin-top:32px;">
     <div class="splash-bar-fill" id="splashBarFill"></div>
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
+  <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998</div>
+    <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
+  </div>
 </div>
 
 <div id="setupOverlay">
@@ -5505,8 +5518,12 @@ function createNewSheet() {
     <div class="setup-sub">
       הדבק את כתובת ה-Apps Script שקיבלת מגיליון ה-AirLog שלך.
     </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.5;">
+      הכתובת נראית כך:<br>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--cyan);">https://script.google.com/macros/s/.../exec</span>
+    </div>
     <input type="text" class="setup-input" id="setupUrl"
-           placeholder="https://script.google.com/macros/s/.../exec"
+           placeholder="📋 הדבק כאן..."
            dir="ltr" autocomplete="off" spellcheck="false">
 
     <!-- Validation checks (hidden until save clicked) -->
@@ -5530,6 +5547,10 @@ function createNewSheet() {
       שמור והתחל <span style="display:inline-block;transform:scaleX(-1);">✈</span>
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998</div>
+      <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
+    </div>
   </div>
 </div>
 
