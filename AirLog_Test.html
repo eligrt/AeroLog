@@ -2721,7 +2721,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.997.201T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.997.202T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2839,10 +2839,7 @@ async function saveSetup() {
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
     const res  = await fetch(u + '?action=name', {
-      method: 'GET',
-      mode: 'cors',
       credentials: 'omit',
-      redirect: 'follow',
       cache: 'no-store'
     });
     const data = await res.json();
@@ -5510,7 +5507,7 @@ function createNewSheet() {
 <div id="setupOverlay">
   <div class="setup-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <div class="setup-title" style="margin-bottom:0;">✈ הגדרה ראשונית <span style="font-size:10px;font-weight:400;color:var(--text3);font-family:var(--mono);">v1.997.201T</span></div>
+      <div class="setup-title" style="margin-bottom:0;">✈ הגדרה ראשונית <span style="font-size:10px;font-weight:400;color:var(--text3);font-family:var(--mono);">v1.997.202T</span></div>
       <button id="setupCloseBtn" onclick="closeSetup()" style="display:none;background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">×</button>
     </div>
     <div class="setup-sub">
