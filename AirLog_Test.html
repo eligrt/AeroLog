@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.998.101T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.998.103T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2777,9 +2777,13 @@ const el  = id => document.getElementById(id);
 const pad = n  => String(n).padStart(2, '0');
 const toHM = m => `${Math.floor(m/60)}:${pad(m%60)}`;
 
-// ═══════════════════════════════════════════
-//  SETUP / URL MANAGEMENT
-// ═══════════════════════════════════════════
+// Simple fetch helper for GAS GET requests
+async function fetchJson(url) {
+  const res = await fetch(url, { redirect: 'follow' });
+  return res.json();
+}
+
+
 const LS_KEY = 'flight_log_gas_url';
 
 function getUrl()  { return localStorage.getItem(LS_KEY) || ''; }
@@ -2839,10 +2843,7 @@ async function saveSetup() {
   // Check 2 — connect to sheet
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
-    const res  = await fetch(u + '?action=name', {
-      method: 'GET',
-      redirect: 'follow'
-    });
+    const res  = await fetch(u + '?action=name', { redirect: 'follow' });
     const data = await res.json();
     if (!data || !data.name) throw new Error('invalid response');
     setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
@@ -2992,8 +2993,7 @@ async function obConnectWithUrl(url) {
 
   try {
     // Validate URL by calling ?action=name
-    const res = await fetch(url + '?action=name');
-    const data = await res.json();
+    const data = await fetchJson(url + '?action=name');
 
     if (!data || !data.name) throw new Error('Invalid response');
 
@@ -3096,9 +3096,7 @@ async function fetchConnectedName() {
   badge.textContent = '✓ מחובר';
   badge.classList.add('visible');
   try {
-    const r = await fetch(url + '?action=name');
-    const text = await r.text();
-    const d = JSON.parse(text);
+    const d = await fetchJson(url + '?action=name');
     if (d && d.name) {
       // Strip common prefixes like "AirLog - " or "AeroLog - "
       const name = d.name.replace(/^(air|aero)log\s*[-–]\s*/i, '').trim() || d.name;
@@ -3658,8 +3656,7 @@ async function loadStats() {
   // Pre-fetch count for real progress
   setLB(5, 'מתחבר לשרת...', '');
   try {
-    var cr   = await fetch(gasUrl + '?action=count');
-    var cj   = await cr.json();
+    var cj   = await fetchJson(gasUrl + '?action=count');
     _totalCount = cj.count || 0;
     if (_totalCount) setLB(12, 'נמצאו ' + _totalCount + ' טיסות — טוען...');
   } catch(e) { /* continue without count */ }
@@ -3679,10 +3676,9 @@ async function loadStats() {
   _lbAnim = requestAnimationFrame(_lbTick);
 
   try {
-    const res  = await fetch(gasUrl + '?action=getFlights&lean=1');
+    const json = await fetchJson(gasUrl + '?action=getFlights&lean=1');
     cancelAnimationFrame(_lbAnim);
     setLB(95, 'מעבד נתונים...' + (_totalCount ? ' · ' + _totalCount + '/' + _totalCount : ''));
-    const json = await res.json();
     allRows    = (json.rows || json.flights || []).filter(r => r.date);
     updateFlightNum();
     journalRows = [];
@@ -3761,10 +3757,9 @@ async function loadJournal() {
   animFrame = requestAnimationFrame(animateProgress);
 
   try {
-    const res  = await fetch(gasUrl + '?action=getFlights&lean=0');
+    const json = await fetchJson(gasUrl + '?action=getFlights&lean=0');
     cancelAnimationFrame(animFrame);
     setProgress(92, 'מעבד נתונים...');
-    const json = await res.json();
     journalRows = (json.rows || json.flights || []).filter(r => r.date);
     _journalLoading = false;
     setProgress(100, 'מוכן!');
@@ -5485,6 +5480,17 @@ function closeGasInfo() {
   el('gasInfoModal').style.display = 'none';
 }
 
+function onSetupUrlInput() {
+  const u = el('setupUrl').value.trim();
+  const warmup = el('iosWarmup');
+  if (warmup) warmup.style.display = u.startsWith('https://script.google.com') ? 'block' : 'none';
+}
+
+function warmupGasUrl() {
+  const u = el('setupUrl').value.trim();
+  if (u) window.open(u, '_blank');
+}
+
 // ── NEW SHEET CREATION ──────────────────────────────────────────
 // ── NEW SHEET CREATION ──────────────────────────────────────────
 function createNewSheet() {
@@ -5504,7 +5510,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.101T</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.103T</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5524,7 +5530,19 @@ function createNewSheet() {
     </div>
     <input type="text" class="setup-input" id="setupUrl"
            placeholder="📋 הדבק כאן..."
-           dir="ltr" autocomplete="off" spellcheck="false">
+           dir="ltr" autocomplete="off" spellcheck="false"
+           oninput="onSetupUrlInput()">
+
+    <!-- iOS warm-up step — hidden until URL is pasted -->
+    <div id="iosWarmup" style="display:none;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6;">
+        📱 <strong style="color:var(--text);">משתמשי iPhone / iPad:</strong><br>
+        לחץ על הכפתור למטה לפתיחת הכתובת בדפדפן,<br>ואז חזור לאפליקציה וחבר.
+      </div>
+      <button onclick="warmupGasUrl()" style="background:linear-gradient(135deg,#0891b2,#22d3ee);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
+        🔗 פתח את הכתובת בדפדפן ↗
+      </button>
+    </div>
 
     <!-- Validation checks (hidden until save clicked) -->
     <div id="setupChecks" style="display:none;background:var(--raised);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
@@ -5548,7 +5566,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.101T</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.103T</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
