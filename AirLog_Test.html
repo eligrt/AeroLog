@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.998.107T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.998.108T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2868,16 +2868,14 @@ async function saveSetup() {
   await new Promise(r => setTimeout(r, 400));
   setCheck('setupCheck1', 'ok', 'כתובת תקינה');
 
-  // Check 2 — connect to sheet
+  // Check 2 — skip separate connectivity check, go straight to loading
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
-  try {
-    const data = await iframeGet(u + '?action=name');
-    if (!data || !data.name) throw new Error('invalid response');    setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
+  setCheck('setupCheck3', 'spin', 'טוען נתונים...');
+  saveUrl(u);
 
-    // Check 3 — actually load data
-    setCheck('setupCheck3', 'spin', 'טוען נתונים...');
-    saveUrl(u);
+  try {
     await loadStats();
+    setCheck('setupCheck2', 'ok', 'מחובר לגיליון');
     setCheck('setupCheck3', 'ok', 'הכל מוכן!');
     await new Promise(r => setTimeout(r, 600));
 
@@ -2893,8 +2891,10 @@ async function saveSetup() {
 
   } catch(e) {
     setCheck('setupCheck2', 'err', 'לא הצלחנו להתחבר לגיליון');
-    el('setupErrMsg').textContent = e ? (e.name + ': ' + e.message) : 'unknown';
+    setCheck('setupCheck3', 'err', '');
+    el('setupErrMsg').textContent = 'בדוק שהכתובת נכונה ושה-Script פורס כ-Web App';
     el('setupErrMsg').style.display = 'block';
+    localStorage.removeItem(LS_KEY);
     btn.disabled = false;
     btn.style.opacity = '1';
   }
@@ -5538,7 +5538,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.107T</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.108T</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5560,18 +5560,6 @@ function createNewSheet() {
            placeholder="📋 הדבק כאן..."
            dir="ltr" autocomplete="off" spellcheck="false"
            oninput="onSetupUrlInput()">
-
-    <!-- iOS warm-up step — hidden until URL is pasted -->
-    <div id="iosWarmup" style="display:none;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px;text-align:center;">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6;">
-        📱 <strong style="color:var(--text);">משתמשי iPhone / iPad:</strong><br>
-        לחץ על הכפתור למטה לפתיחת הכתובת בדפדפן,<br>ואז חזור לאפליקציה וחבר.
-      </div>
-      <a id="iosWarmupLink" href="" target="_blank" rel="noopener"
-         style="display:block;background:linear-gradient(135deg,#0891b2,#22d3ee);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;width:100%;text-decoration:none;box-sizing:border-box;">
-        🔗 פתח את הכתובת בדפדפן ↗
-      </a>
-    </div>
 
     <!-- Validation checks (hidden until save clicked) -->
     <div id="setupChecks" style="display:none;background:var(--raised);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
@@ -5595,7 +5583,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.107T</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.108T</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
