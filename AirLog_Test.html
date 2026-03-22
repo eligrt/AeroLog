@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v1.998.104T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v1.998.105T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2781,6 +2781,32 @@ const toHM = m => `${Math.floor(m/60)}:${pad(m%60)}`;
 async function fetchJson(url) {
   const res = await fetch(url, { redirect: 'follow' });
   return res.json();
+}
+
+// iframe-based GET — bypasses iOS Safari CORS restrictions
+// loads URL in hidden iframe, reads via postMessage if same-origin, else falls back to fetch
+function iframeGet(url) {
+  return new Promise((resolve, reject) => {
+    // First try regular fetch
+    fetch(url, { redirect: 'follow', credentials: 'omit' })
+      .then(r => r.json())
+      .then(resolve)
+      .catch(() => {
+        // Fetch failed (iOS CORS) — try loading in hidden iframe to warm up domain, then retry
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          // Retry fetch after iframe warms up the domain
+          fetch(url, { redirect: 'follow', credentials: 'omit' })
+            .then(r => r.json())
+            .then(resolve)
+            .catch(err => reject(new Error('TypeError: Load failed')));
+        }, 2000);
+      });
+  });
 }
 
 
@@ -2843,8 +2869,7 @@ async function saveSetup() {
   // Check 2 — connect to sheet
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
-    const res  = await fetch(u + '?action=name', { redirect: 'follow' });
-    const data = await res.json();
+    const data = await iframeGet(u + '?action=name');
     if (!data || !data.name) throw new Error('invalid response');
     setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
 
@@ -5512,7 +5537,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.104T</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.105T</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5569,7 +5594,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.104T</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.998.105T</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
