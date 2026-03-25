@@ -361,7 +361,7 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 0;
   height: 100%;
   justify-content: flex-end;
 }
@@ -466,22 +466,36 @@ body::before {
     </div>
   </div>
 
+  <!-- DEVICE BREAKDOWN — single line, moved above chart -->
+  <div class="section" style="margin-bottom:16px;">
+    <div class="sec-head">
+      <div class="sec-title">📱 פילוח מכשירים</div>
+    </div>
+    <div class="sec-body" style="padding:12px 16px;">
+      <div id="deviceGrid"><div class="empty-state">טוען...</div></div>
+    </div>
+  </div>
+
   <!-- ACTIVITY CHART -->
   <div class="section">
     <div class="sec-head">
       <div class="sec-title">📈 פעילות — 14 ימים אחרונים</div>
     </div>
     <div class="sec-body">
-      <div class="chart-wrap" id="activityChart">
+      <div class="chart-wrap" id="activityChart" style="height:110px;">
         <div class="empty-state" style="width:100%;">טוען...</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;direction:ltr;">
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#22c55e;display:inline-block;"></span>רישום טיסה</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#60a5fa;display:inline-block;"></span>כניסה</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#f87171;display:inline-block;"></span>ארכוב</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#fbbf24;display:inline-block;"></span>הצטרפות</span>
       </div>
     </div>
   </div>
 
-  <!-- USERS TABLE + DEVICE BREAKDOWN side by side on wide screens -->
+  <!-- USERS TABLE -->
   <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px;" id="midGrid">
-
-    <!-- USERS TABLE -->
     <div class="section">
       <div class="sec-head" onclick="toggleUsers()" style="cursor:pointer;">
         <div class="sec-title">👤 משתמשים</div>
@@ -506,19 +520,6 @@ body::before {
         </table>
       </div>
     </div>
-
-    <!-- DEVICE BREAKDOWN -->
-    <div class="section">
-      <div class="sec-head">
-        <div class="sec-title">📱 פילוח מכשירים</div>
-      </div>
-      <div class="sec-body">
-        <div class="device-grid" id="deviceGrid">
-          <div class="empty-state">טוען...</div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- RECENT ACTIVITY FEED -->
@@ -542,9 +543,10 @@ body::before {
       </select>
       <div style="flex:1;min-width:8px;"></div>
       <span style="font-size:11px;color:var(--text3);align-self:center;">טווח:</span>
-      <button class="feed-pill active" onclick="setFeedRange(20)" id="fr-20">20 אחרונים</button>
+      <button class="feed-pill active" onclick="setFeedRange(5)"  id="fr-5">5 אחרונים</button>
+      <button class="feed-pill" onclick="setFeedRange(20)" id="fr-20">20 אחרונים</button>      <button class="feed-pill" onclick="setFeedRange(30)" id="fr-30">חודש</button>
       <button class="feed-pill" onclick="setFeedRange(90)" id="fr-90">3 חודשים</button>
-      <button class="feed-pill" onclick="setFeedRange(0)" id="fr-0">הכל</button>
+      <button class="feed-pill" onclick="setFeedRange(0)"  id="fr-0">הכל</button>
     </div>
     <div class="sec-body" style="padding:0 16px;">
       <div class="feed-list" id="feedList">
@@ -556,7 +558,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.51 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.6 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -565,7 +567,7 @@ const ADMIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbwMROMQAzdAz-dCNd
 
 let allEvents = [];
 let _feedFilter = 'all';
-let _feedRange  = 20;
+let _feedRange  = 5;
 
 function setFeedFilter(f) {
   _feedFilter = f;
@@ -656,33 +658,52 @@ function renderSummary() {
 // ── ACTIVITY CHART (14 days) ────────────────────────────────────
 function renderChart() {
   const wrap = document.getElementById('activityChart');
-  const days = 14;
+  const days  = 14;
+  const eventColors = {
+    'flight_recorded':  '#22c55e',
+    'app_open':         '#60a5fa',
+    'flight_archived':  '#f87171',
+    'setup_completed':  '#fbbf24'
+  };
   const buckets = {};
-
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    buckets[fmtDay(d)] = 0;
+    buckets[fmtDay(d)] = { total: 0, flight_recorded: 0, app_open: 0, flight_archived: 0, setup_completed: 0 };
   }
 
   allEvents.forEach(e => {
-    if (e.event !== 'flight_recorded' && e.event !== 'app_open') return;
     const d = fmtDay(parseDate(e.timestamp));
-    if (d in buckets) buckets[d]++;
+    if (!(d in buckets)) return;
+    buckets[d].total++;
+    if (buckets[d][e.event] !== undefined) buckets[d][e.event]++;
   });
 
-  const vals   = Object.values(buckets);
   const labels = Object.keys(buckets);
-  const maxVal = Math.max(...vals, 1);
+  const vals   = labels.map(l => buckets[l]);
+  const maxVal = Math.max(...vals.map(v => v.total), 1);
 
   wrap.innerHTML = labels.map((lbl, i) => {
-    const pct = Math.round((vals[i] / maxVal) * 100);
-    // Convert yyyy-mm-dd to dd/mm
+    const v    = vals[i];
+    const pct  = Math.round((v.total / maxVal) * 100);
     const parts = lbl.split('-');
     const short = parts[2] + '/' + parts[1];
+    // Stacked segments
+    const segs = ['flight_recorded','app_open','flight_archived','setup_completed']
+      .filter(k => v[k] > 0)
+      .map(k => {
+        const segPct = Math.round(v[k] / v.total * 100);
+        return `<div style="width:100%;height:${Math.round(v[k]/maxVal*100)}%;background:${eventColors[k]};flex-shrink:0;" title="${k}: ${v[k]}"></div>`;
+      }).join('');
+
     return `
       <div class="chart-bar-col">
-        <div class="chart-bar" style="height:${Math.max(pct, 2)}%;" title="${vals[i]} אירועים"></div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-align:center;margin-bottom:2px;">${v.total || ''}</div>
+        <div style="flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;">
+          ${['flight_recorded','app_open','flight_archived','setup_completed'].filter(k => v[k] > 0).map(k =>
+            `<div style="width:100%;height:${Math.round(v[k]/maxVal*100)}%;min-height:${v[k]>0?2:0}px;background:${eventColors[k]};border-radius:2px 2px 0 0;" title="${k}: ${v[k]}"></div>`
+          ).join('')}
+        </div>
         <div class="chart-lbl">${short}</div>
       </div>`;
   }).join('');
@@ -759,7 +780,6 @@ function renderDevices() {
     return;
   }
 
-  // Colors per device type
   const colors = {
     'Android': '#22c55e',
     'iPhone':  '#fbbf24',
@@ -768,18 +788,29 @@ function renderDevices() {
     'Unknown': '#4a6f96'
   };
 
-  document.getElementById('deviceGrid').innerHTML = sorted.map(([type, count]) => {
+  // Single stacked bar
+  const segments = sorted.map(([type, count]) => {
     const pct   = Math.round(count / total * 100);
     const color = colors[type] || '#4a6f96';
-    return `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;direction:ltr;">
-        <div style="width:90px;font-size:12px;font-family:var(--mono);color:var(--text2);text-align:right;flex-shrink:0;">${type}</div>
-        <div style="flex:1;height:10px;background:var(--raised);border-radius:10px;overflow:hidden;border:1px solid var(--border);">
-          <div style="height:100%;width:${pct}%;background:${color};border-radius:10px;transition:width .6s ease;"></div>
-        </div>
-        <div style="width:40px;font-size:11px;font-family:var(--mono);color:var(--text3);text-align:left;flex-shrink:0;">${pct}% <span style="color:var(--text3);font-size:10px;">(${count})</span></div>
-      </div>`;
+    return `<div style="width:${pct}%;background:${color};height:100%;transition:width .6s ease;" title="${type}: ${pct}% (${count})"></div>`;
   }).join('');
+
+  // Legend
+  const legend = sorted.map(([type, count]) => {
+    const pct   = Math.round(count / total * 100);
+    const color = colors[type] || '#4a6f96';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);font-family:var(--mono);">
+      <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>
+      ${type} ${pct}%
+    </span>`;
+  }).join('');
+
+  document.getElementById('deviceGrid').innerHTML = `
+    <div style="height:14px;border-radius:8px;overflow:hidden;display:flex;background:var(--raised);border:1px solid var(--border);margin-bottom:10px;">
+      ${segments}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;direction:ltr;">${legend}</div>
+  `;
 }
 
 // ── ACTIVITY FEED ────────────────────────────────────────────────
