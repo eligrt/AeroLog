@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.02<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.03<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2805,9 +2805,14 @@ function getDeviceInfo() {
   if (/iPad/.test(ua))        { device = 'iPad';    os = 'iPadOS ' + (ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g,'.') || ''); }
   else if (/iPhone/.test(ua)) { device = 'iPhone';  os = 'iOS '    + (ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g,'.') || ''); }
   else if (/Android/.test(ua)) {
-    const model = ua.match(/Android[\s\d.]+;\s*([^)]+)/)?.[1]?.trim() || 'Android device';
-    device = model;
     os = 'Android ' + (ua.match(/Android ([\d.]+)/)?.[1] || '');
+    // Try to get model — Android UA format: (Linux; Android X.X; MODEL)
+    let model = ua.match(/;\s*([^;)]+)\)\s*AppleWebKit/)?.[1]?.trim() || '';
+    // 'K' is Google's privacy placeholder — try navigator.userAgentData if available
+    if (!model || model === 'K' || model.length <= 2) {
+      model = (navigator.userAgentData?.platform) || 'Android device';
+    }
+    device = model;
   }
   else if (/Mac/.test(ua))    { device = 'Mac';     os = 'macOS'; }
   else if (/Windows/.test(ua)){ device = 'PC';      os = 'Windows'; }
@@ -2829,7 +2834,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.02',
+      appVersion:   'v2.03',
       totalFlights: extraData.totalFlights || 0
     };
     fetch(ADMIN_GAS_URL, {
@@ -5140,6 +5145,11 @@ async function archiveFlight(e, idx) {
       banner.className = 'archive-progress show success';
       banner.innerHTML = '<span>✓ הטיסה אורכבה בהצלחה</span>';
     }
+    // Report flight_archived event silently
+    reportEvent('flight_archived', {
+      sheetName:    window._adminSheetName || '',
+      totalFlights: allRows.length - 1
+    });
     if (card) card.classList.add('archiving');
     setTimeout(() => {
       journalRows = journalRows.filter(r => r !== row);
@@ -5586,7 +5596,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.02</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.03</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5637,7 +5647,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.02</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.03</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
