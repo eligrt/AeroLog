@@ -2265,7 +2265,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       </div>
 
       <!-- ⏱ משך טיסה — full width -->
-      <div class="sec-lbl">⏱ משך טיסה</div>
+      <div class="sec-lbl">⏱ משך טיסה <span class="req">*</span></div>
       <div class="card" id="splitHeadTime" style="margin-top:4px;">
         <div class="time-card-body" id="tpSingle">
           <div class="time-inner" style="align-items:center;">
@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.03<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.04<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2834,7 +2834,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.03',
+      appVersion:   'v2.04',
       totalFlights: extraData.totalFlights || 0
     };
     fetch(ADMIN_GAS_URL, {
@@ -3460,6 +3460,34 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!payload.acType) {
+      errBar.textContent = 'יש לבחור סוג מטוס';
+      errBar.classList.add('show');
+      btn.disabled = false;
+      el('btnLabel').style.display   = '';
+      el('btnSpinner').style.display = 'none';
+      return;
+    }
+
+    if (!payload.aircraft) {
+      errBar.textContent = 'יש לבחור זיהוי / או"ק';
+      errBar.classList.add('show');
+      btn.disabled = false;
+      el('btnLabel').style.display   = '';
+      el('btnSpinner').style.display = 'none';
+      return;
+    }
+
+    if ((state.pic + state.dual) === 0) {
+      errBar.textContent = 'יש להזין משך טיסה';
+      errBar.classList.add('show');
+      btn.disabled = false;
+      el('btnLabel').style.display   = '';
+      el('btnSpinner').style.display = 'none';
+      return;
+    }
+    }
+
     try {
       const res  = await fetch(gasUrl, { method:'POST', body: JSON.stringify(payload) });
       const text = await res.text();
@@ -3519,7 +3547,9 @@ function resetForm() {
   setFlightMode('pic');
   renderActive();
   const tpManual = el('tpManual');
-  if (tpManual) { tpManual.classList.remove('open'); const t = tpManual.previousElementSibling; if(t) t.textContent='✏ הזן ידנית'; }
+  if (tpManual) { tpManual.classList.remove('open'); }
+  const tpMlbl = tpManual ? tpManual.querySelector('.tp-mlbl') : null;
+  if (tpMlbl) tpMlbl.textContent = 'או הזן ידנית';
   initDate();
   populateLogFormAcDropdowns();
   applyDefaultAcToForm();
@@ -5596,7 +5626,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.03</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.04</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5647,7 +5677,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.03</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.04</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
