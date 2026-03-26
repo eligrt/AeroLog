@@ -352,18 +352,22 @@ body::before {
 .chart-wrap {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  gap: 2px;
   height: 80px;
   direction: ltr;
+  width: 100%;
+  overflow: hidden;
 }
 .chart-bar-col {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0;
   height: 100%;
   justify-content: flex-end;
+  overflow: hidden;
 }
 .chart-bar {
   width: 100%;
@@ -373,10 +377,12 @@ body::before {
   min-height: 2px;
 }
 .chart-lbl {
-  font-size: 9px;
+  font-size: 8px;
   color: var(--text3);
   font-family: var(--mono);
   white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 /* ── FEED PILLS ── */
@@ -579,7 +585,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.92 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.93 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -607,7 +613,7 @@ function setFeedRange(r) {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v1.92';
+const ADMIN_VERSION = 'v1.93';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -768,7 +774,7 @@ function renderChart() {
   wrap.innerHTML = labels.map((lbl, i) => {
     const v     = vals[i];
     const parts = lbl.split('-');
-    const short = parts[2] + '/' + parts[1];
+    const short = _chartDays <= 7 ? parts[2] + '/' + parts[1] : parts[2];
 
     const segs = ['flight_recorded','app_open','flight_archived','setup_completed']
       .filter(k => v[k] > 0)
