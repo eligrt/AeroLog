@@ -439,6 +439,15 @@ body::before {
   </div>
 </div>
 
+<!-- LOADING BAR -->
+<div id="loadingBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:100;">
+  <div id="loadingBarFill" style="height:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));width:0%;transition:width .4s ease;"></div>
+</div>
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(6,14,10,.7);z-index:99;backdrop-filter:blur(2px);align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+  <div style="font-size:28px;animation:spin .8s linear infinite;">↻</div>
+  <div style="font-family:var(--mono);font-size:13px;color:var(--accent2);" id="loadingMsg">טוען נתונים...</div>
+</div>
+
 <!-- PAGE -->
 <div class="page">
 
@@ -558,7 +567,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.6 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.7 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -589,19 +598,38 @@ function setFeedRange(r) {
 async function loadAll() {
   const btn  = document.getElementById('btnRefresh');
   const icon = document.getElementById('refreshIcon');
+  const overlay = document.getElementById('loadingOverlay');
+  const bar     = document.getElementById('loadingBar');
+  const barFill = document.getElementById('loadingBarFill');
+  const msg     = document.getElementById('loadingMsg');
+
   btn.classList.add('loading');
   icon.classList.add('spin');
+  overlay.style.display = 'flex';
+  bar.style.display = 'block';
+  barFill.style.width = '0%';
+  setTimeout(() => { barFill.style.width = '60%'; }, 50);
 
   try {
     const res  = await fetch(ADMIN_GAS_URL + '?action=getEvents');
     const data = await res.json();
     allEvents  = data.events || [];
+    barFill.style.width = '100%';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      bar.style.display = 'none';
+      barFill.style.width = '0%';
+    }, 300);
     render();
     const now = new Date();
     const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const footer = document.getElementById('footerUpdateTime');
     if (footer) footer.textContent = '· עודכן ' + timeStr;
   } catch(e) {
+    barFill.style.background = 'var(--red)';
+    barFill.style.width = '100%';
+    setTimeout(() => { overlay.style.display = 'none'; bar.style.display = 'none'; barFill.style.width = '0%'; barFill.style.background = ''; }, 1500);
+    if (msg) msg.textContent = '⚠ שגיאת טעינה';
     const ft = document.getElementById('footerUpdateTime');
     if (ft) ft.textContent = '· ⚠ שגיאת טעינה';
     console.error(e);
