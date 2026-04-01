@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.07<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.08<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2862,7 +2862,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.07',
+      appVersion:   'v2.08',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -2962,13 +2962,8 @@ async function saveSetup() {
     fetchConnectedName();
     renderCurrency();
     if (!_journalLoading) loadJournal();
-    // Report setup_completed for new users + connection_success
+    // Report setup_completed for new users
     reportEvent('setup_completed', {
-      sheetName:    window._adminSheetName || '',
-      totalFlights: allRows.length,
-      status:       'success'
-    });
-    reportEvent('connection_success', {
       sheetName:    window._adminSheetName || '',
       totalFlights: allRows.length,
       status:       'success'
@@ -2986,11 +2981,6 @@ async function saveSetup() {
     el('setupErrMsg').style.display = 'block';
     btn.disabled = false;
     btn.style.opacity = '1';
-    // Report connection_error with full diagnostics
-    reportEvent('connection_error', {
-      status:   'error',
-      errorMsg: e && e.message ? e.message : String(e)
-    });
   }
 }
 
@@ -5670,7 +5660,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.07</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.08</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5721,7 +5711,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.07</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.08</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
