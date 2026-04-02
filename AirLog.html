@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.10<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.11<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2883,7 +2883,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.10',
+      appVersion:   'v2.11',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -3002,7 +3002,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.10',
+        'App Ver:    v2.11',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -3923,13 +3923,22 @@ async function loadJournal() {
   _journalLoading = true;
   const gasUrl = getUrl();
   if (!gasUrl) { _journalLoading = false; return; }
-  const out = el('searchResults');
   const total = allRows.length;
 
-  // show progress UI
+  // Show full-view overlay progress (like other tabs) instead of inside results
+  const view = el('view-search');
+  let overlay = el('journalLoadOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'journalLoadOverlay';
+    overlay.style.cssText = 'position:absolute;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+    view.style.position = 'relative';
+    view.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+
   function setProgress(pct, label) {
-    if (!out) return;
-    out.innerHTML =
+    overlay.innerHTML =
       '<div class="jload-wrap">' +
         '<div class="jload-icon">📖</div>' +
         '<div class="jload-label">' + label + '</div>' +
@@ -3967,6 +3976,7 @@ async function loadJournal() {
     _journalLoading = false;
     setProgress(100, 'מוכן!');
     setTimeout(function() {
+      if (overlay) overlay.style.display = 'none';
       populateJournalAcPills();
       searchJournal();
       const now = new Date();
@@ -3980,7 +3990,9 @@ async function loadJournal() {
   } catch(err) {
     cancelAnimationFrame(animFrame);
     _journalLoading = false;
+    if (overlay) overlay.style.display = 'none';
     console.error('loadJournal error:', err);
+    const out = el('searchResults');
     if (out) out.innerHTML = '<div class="stats-empty"><div style="color:#ef4444;padding:16px 0">שגיאה בטעינת היומן ↻</div></div>';
   }
 }
@@ -5707,7 +5719,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.10</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.11</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5759,7 +5771,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.10</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.11</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
