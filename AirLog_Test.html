@@ -2722,7 +2722,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.09.01T<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.09.02T<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2782,25 +2782,23 @@ const toHM = m => `${Math.floor(m/60)}:${pad(m%60)}`;
 // ═══════════════════════════════════════════
 const LS_KEY = 'flight_log_gas_url';
 
-// ── JSONP fetch — bypasses iOS WebKit CORS block ─────────────────
-function jsonpFetch(url) {
-  return new Promise((resolve, reject) => {
-    const cbName = '_jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-    const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('JSONP timeout'));
-    }, 10000);
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-    window[cbName] = function(data) { cleanup(); resolve(data); };
-    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    script.onerror = () => { cleanup(); reject(new Error('JSONP load failed')); };
-    document.head.appendChild(script);
-  });
+// ── CLOUDFLARE PROXY — iOS WebKit CORS bypass ────────────────────
+const CF_PROXY = 'https://airlog-proxy.eligrt.workers.dev/';
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+// Smart fetch — proxy on iOS, direct on Android/PC
+async function smartFetch(url) {
+  if (isIOS) {
+    const gasBase  = url.split('?')[0];
+    const params   = url.includes('?') ? url.split('?')[1] : '';
+    const proxyUrl = CF_PROXY + '?gasUrl=' + encodeURIComponent(gasBase) + (params ? '&' + params : '');
+    const res = await fetch(proxyUrl);
+    return res.json();
+  }
+  const res = await fetch(url);
+  return res.json();
 }
 
 function getUrl()  { return localStorage.getItem(LS_KEY) || ''; }
@@ -2883,7 +2881,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.09.01T',
+      appVersion:   'v2.09.02T',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -2959,7 +2957,7 @@ async function saveSetup() {
   // Check 2 — connect to sheet
   setCheck('setupCheck2', 'spin', 'מתחבר לגיליון...');
   try {
-    const data = await jsonpFetch(u + '?action=name');
+    const data = await smartFetch(u + '?action=name');
     if (!data || !data.name) throw new Error('invalid response');
     setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
 
@@ -3000,7 +2998,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.09.01T',
+        'App Ver:    v2.09.02T',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -3154,7 +3152,7 @@ async function obConnectWithUrl(url) {
 
   try {
     // Validate URL by calling ?action=name
-    const data = await jsonpFetch(url + '?action=name');
+    const data = await smartFetch(url + '?action=name');
 
     if (!data || !data.name) throw new Error('Invalid response');
 
@@ -3262,7 +3260,7 @@ async function fetchConnectedName() {
   badge.textContent = '✓ מחובר';
   badge.classList.add('visible');
   try {
-    const d = await jsonpFetch(url + '?action=name');
+    const d = await smartFetch(url + '?action=name');
     if (d && d.name) {
       // Strip common prefixes like "AirLog - " or "AeroLog - "
       const name = d.name.replace(/^(air|aero)log\s*[-–]\s*/i, '').trim() || d.name;
@@ -3857,7 +3855,7 @@ async function loadStats() {
   // Pre-fetch count for real progress
   setLB(5, 'מתחבר לשרת...', '');
   try {
-    var cj   = await jsonpFetch(gasUrl + '?action=count');
+    var cj   = await smartFetch(gasUrl + '?action=count');
     _totalCount = cj.count || 0;
     if (_totalCount) setLB(12, 'נמצאו ' + _totalCount + ' טיסות — טוען...');
   } catch(e) { /* continue without count */ }
@@ -3877,7 +3875,7 @@ async function loadStats() {
   _lbAnim = requestAnimationFrame(_lbTick);
 
   try {
-    const json = await jsonpFetch(gasUrl + '?action=getFlights&lean=1');
+    const json = await smartFetch(gasUrl + '?action=getFlights&lean=1');
     cancelAnimationFrame(_lbAnim);
     setLB(95, 'מעבד נתונים...' + (_totalCount ? ' · ' + _totalCount + '/' + _totalCount : ''));
     allRows    = (json.rows || json.flights || []).filter(r => r.date);
@@ -3958,7 +3956,7 @@ async function loadJournal() {
   animFrame = requestAnimationFrame(animateProgress);
 
   try {
-    const json = await jsonpFetch(gasUrl + '?action=getFlights&lean=0');
+    const json = await smartFetch(gasUrl + '?action=getFlights&lean=0');
     cancelAnimationFrame(animFrame);
     setProgress(92, 'מעבד נתונים...');
     journalRows = (json.rows || json.flights || []).filter(r => r.date);
@@ -5705,7 +5703,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.09.01T</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.09.02T</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5756,7 +5754,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.09.01T</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.09.02T</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
