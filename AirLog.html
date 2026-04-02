@@ -2494,6 +2494,13 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   <!-- ══════════ SEARCH / JOURNAL VIEW ══════════ -->
   <div class="view" id="view-search">
 
+    <div class="load-bar-wrap" id="loadBarJournal" style="display:none;">
+      <div class="load-bar-icon">📖</div>
+      <div class="load-bar-title">טוען יומן טיסות...</div>
+      <div class="load-bar-track" dir="ltr"><div class="load-bar-fill" id="loadBarJournalFill"></div></div>
+      <div class="load-bar-label" id="loadBarJournalLabel">מתחבר לשרת...</div>
+    </div>
+
 
 
     <!-- Edit mode warning banner -->
@@ -2722,7 +2729,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.11<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.12<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2883,7 +2890,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.11',
+      appVersion:   'v2.12',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -3002,7 +3009,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.11',
+        'App Ver:    v2.12',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -3925,29 +3932,23 @@ async function loadJournal() {
   if (!gasUrl) { _journalLoading = false; return; }
   const total = allRows.length;
 
-  // Show full-view overlay progress (like other tabs) instead of inside results
-  const view = el('view-search');
-  let overlay = el('journalLoadOverlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'journalLoadOverlay';
-    overlay.style.cssText = 'position:absolute;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
-    view.style.position = 'relative';
-    view.appendChild(overlay);
-  }
-  overlay.style.display = 'flex';
-
   function setProgress(pct, label) {
-    overlay.innerHTML =
-      '<div class="jload-wrap">' +
-        '<div class="jload-icon">📖</div>' +
-        '<div class="jload-label">' + label + '</div>' +
-        '<div class="jload-track" dir="ltr">' +
-          '<div class="jload-fill" style="width:' + Math.round(pct) + '%"></div>' +
-        '</div>' +
-        (total ? '<div class="jload-count" dir="ltr">' + Math.round(pct / 100 * total) + ' / ' + total +
-          ' רשומות · ' + Math.round(pct) + '%</div>' : '') +
-      '</div>';
+    const wrap = el('loadBarJournal');
+    const fill = el('loadBarJournalFill');
+    const lbl  = el('loadBarJournalLabel');
+    if (!wrap) return;
+    wrap.style.display = 'flex';
+    if (fill) fill.style.width = Math.round(pct) + '%';
+    if (lbl)  lbl.textContent = label;
+    const card = el('view-search') ? el('view-search').querySelector('.card') : null;
+    if (card) card.style.display = 'none';
+  }
+
+  function hideBar() {
+    const wrap = el('loadBarJournal');
+    if (wrap) wrap.style.display = 'none';
+    const card = el('view-search') ? el('view-search').querySelector('.card') : null;
+    if (card) card.style.display = '';
   }
 
   setProgress(5, 'מתחבר לשרת...');
@@ -3977,6 +3978,7 @@ async function loadJournal() {
     setProgress(100, 'מוכן!');
     setTimeout(function() {
       if (overlay) overlay.style.display = 'none';
+      hideBar();
       populateJournalAcPills();
       searchJournal();
       const now = new Date();
@@ -3991,6 +3993,7 @@ async function loadJournal() {
     cancelAnimationFrame(animFrame);
     _journalLoading = false;
     if (overlay) overlay.style.display = 'none';
+    hideBar();
     console.error('loadJournal error:', err);
     const out = el('searchResults');
     if (out) out.innerHTML = '<div class="stats-empty"><div style="color:#ef4444;padding:16px 0">שגיאה בטעינת היומן ↻</div></div>';
@@ -5719,7 +5722,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.11</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.12</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5771,7 +5774,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.11</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.12</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
