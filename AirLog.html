@@ -2729,7 +2729,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.18<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.19<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2890,7 +2890,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.18',
+      appVersion:   'v2.19',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -2970,7 +2970,8 @@ async function saveSetup() {
   try {
     const data = await smartFetch(u + '?action=name');
     if (!data || !data.name) throw new Error('invalid response');
-    setCheck('setupCheck2', 'ok', `גיליון נמצא — ${data.name}`);
+    const sheetName = data.name;
+    setCheck('setupCheck2', 'ok', `גיליון נמצא — ${sheetName}`);
 
     // Check 3 — actually load data
     setCheck('setupCheck3', 'spin', 'טוען נתונים...');
@@ -2990,7 +2991,7 @@ async function saveSetup() {
     if (!_journalLoading) loadJournal();
     // Report setup_completed for new users
     reportEvent('setup_completed', {
-      sheetName:    window._adminSheetName || '',
+      sheetName:    sheetName,
       totalFlights: allRows.length,
       status:       'success'
     });
@@ -3009,7 +3010,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.18',
+        'App Ver:    v2.19',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -5726,7 +5727,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.18</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.19</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5778,7 +5779,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.18</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.19</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
