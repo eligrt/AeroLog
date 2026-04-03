@@ -616,7 +616,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.94 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.95 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -644,7 +644,7 @@ function setFeedRange(r) {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v1.94';
+const ADMIN_VERSION = 'v1.95';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -995,10 +995,13 @@ function renderFeed() {
 // ── HELPERS ──────────────────────────────────────────────────────
 function parseDate(str) {
   if (!str) return new Date(0);
-  // Format: dd/MM/yyyy HH:mm:ss
+  // Format 1: dd/MM/yyyy HH:mm:ss (our standard GAS format)
   const m = str.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/);
   if (m) return new Date(m[3], m[2]-1, m[1], m[4], m[5]);
-  return new Date(str);
+  // Format 2: anything else — let JS try to parse it natively
+  const d = new Date(str);
+  if (!isNaN(d.getTime())) return d;
+  return new Date(0);
 }
 
 function fmtDay(d) {
