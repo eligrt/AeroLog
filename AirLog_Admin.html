@@ -8,23 +8,23 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg:       #070f09;
-  --bg2:      #0a1a0c;
-  --surface:  #0f2414;
-  --raised:   #162e1a;
-  --hover:    #1d3d22;
-  --border:   #244d2b;
-  --border2:  #3a8045;
-  --text:     #eaf6ec;
-  --text2:    #a8d4ae;
-  --text3:    #5a8f62;
-  --accent:   #34d399;
-  --accent2:  #6ee7b7;
-  --glow:     #34d39930;
+  --bg:       #0d0f12;
+  --bg2:      #11141a;
+  --surface:  #161b22;
+  --raised:   #1e2530;
+  --hover:    #252d3a;
+  --border:   #2a3444;
+  --border2:  #3d4f66;
+  --text:     #e8edf4;
+  --text2:    #9aafc4;
+  --text3:    #5a7290;
+  --accent:   #7eb8f7;
+  --accent2:  #a8d0fa;
+  --glow:     #7eb8f720;
   --cyan:     #22d3ee;
   --amber:    #fbbf24;
   --red:      #f87171;
-  --blue:     #60a5fa;
+  --blue:     #7eb8f7;
   --mono:     'IBM Plex Mono', monospace;
   --sans:     'IBM Plex Sans Hebrew', sans-serif;
   --r:        12px;
@@ -45,7 +45,7 @@ body::before {
   top: -100px; left: 50%;
   transform: translateX(-50%);
   width: 600px; height: 400px;
-  background: radial-gradient(ellipse, #22c55e12 0%, transparent 70%);
+  background: radial-gradient(ellipse, #7eb8f712 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -73,8 +73,8 @@ body::before {
   font-size: 10px;
   font-weight: 700;
   color: var(--accent);
-  background: rgba(34,197,94,.1);
-  border: 1px solid rgba(34,197,94,.3);
+  background: rgba(126,184,247,.1);
+  border: 1px solid rgba(126,184,247,.3);
   border-radius: 20px;
   padding: 2px 8px;
   letter-spacing: .08em;
@@ -106,7 +106,7 @@ body::before {
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
-  background: rgba(34,197,94,.08);
+  background: rgba(126,184,247,.08);
   border: 1px solid var(--border2);
   border-radius: 8px;
   color: var(--accent2);
@@ -116,7 +116,7 @@ body::before {
   cursor: pointer;
   transition: all .15s;
 }
-.btn-refresh:hover { background: rgba(34,197,94,.15); }
+.btn-refresh:hover { background: rgba(126,184,247,.15); }
 .btn-refresh.loading { opacity: .6; pointer-events: none; }
 .spin { display: inline-block; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -168,6 +168,16 @@ body::before {
 .sum-card.c-cyan .sum-val  { color: var(--cyan); }
 .sum-card.c-amber .sum-val { color: var(--amber); }
 .sum-card.c-blue .sum-val  { color: var(--blue); }
+.sum-card.c-star .sum-val  { color: var(--amber); }
+.sum-trend {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.trend-up   { color: #34d399; }
+.trend-down { color: #f87171; }
+.trend-flat { color: var(--text3); }
 
 /* ── SECTION ── */
 .section {
@@ -253,7 +263,7 @@ body::before {
   padding: 8px 10px;
   font-size: 10px;
   font-weight: 700;
-  color: var(--text3);
+  color: var(--text2);
   letter-spacing: .06em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border);
@@ -268,6 +278,9 @@ body::before {
 }
 .users-table tr:last-child td { border-bottom: none; }
 .users-table tr:hover td { background: var(--raised); }
+.sort-arrow { font-size: 9px; color: var(--text3); margin-right: 2px; }
+.users-table th:hover { color: var(--accent2); }
+.users-table td { color: var(--text); }
 .user-name {
   font-weight: 700;
   color: var(--text);
@@ -284,7 +297,7 @@ body::before {
   font-family: var(--mono);
   font-weight: 600;
 }
-.dt-android { background: rgba(34,197,94,.1);  color: var(--accent2); border: 1px solid rgba(34,197,94,.2); }
+.dt-android { background: rgba(126,184,247,.1);  color: var(--accent2); border: 1px solid rgba(126,184,247,.2); }
 .dt-ios     { background: rgba(251,191,36,.1); color: var(--amber);   border: 1px solid rgba(251,191,36,.2); }
 .dt-pc      { background: rgba(96,165,250,.1); color: var(--blue);    border: 1px solid rgba(96,165,250,.2); }
 .dt-other   { background: rgba(148,163,184,.1);color: var(--text3);   border: 1px solid var(--border); }
@@ -399,7 +412,7 @@ body::before {
   font-family: var(--sans);
 }
 .feed-pill:hover { border-color: var(--border2); color: var(--text2); }
-.feed-pill.active { background: rgba(34,197,94,.1); border-color: var(--accent); color: var(--accent2); }
+.feed-pill.active { background: rgba(126,184,247,.1); border-color: var(--accent); color: var(--accent2); }
 
 /* ── EMPTY STATE ── */
 .empty-state {
@@ -460,34 +473,63 @@ body::before {
 <!-- PAGE -->
 <div class="page">
 
-  <!-- SUMMARY CARDS -->
-  <div class="summary-grid">
+  <!-- SUMMARY CARDS — row 1: stats -->
+  <div class="summary-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:10px;">
     <div class="sum-card">
       <div class="sum-icon">👥</div>
-      <div class="sum-val" id="sumUsers">—</div>
-      <div class="sum-lbl">משתמשים</div>
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <div class="sum-val" id="sumUsers">—</div>
+        <div class="sum-trend" id="trendUsers"></div>
+      </div>
+      <div class="sum-lbl">משתמשים רשומים</div>
     </div>
     <div class="sum-card c-cyan">
       <div class="sum-icon">✈</div>
-      <div class="sum-val" id="sumFlights">—</div>
-      <div class="sum-lbl">טיסות נרשמו</div>
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <div class="sum-val" id="sumFlights">—</div>
+        <div class="sum-trend" id="trendFlights"></div>
+      </div>
+      <div class="sum-lbl">טיסות נרשמו באפ</div>
     </div>
     <div class="sum-card c-amber">
       <div class="sum-icon">🆕</div>
-      <div class="sum-val" id="sumNew">—</div>
-      <div class="sum-lbl">הרשמות</div>
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <div class="sum-val" id="sumNew">—</div>
+        <div class="sum-trend" id="trendNew"></div>
+      </div>
+      <div class="sum-lbl">התקנות</div>
     </div>
     <div class="sum-card c-blue">
       <div class="sum-icon">📲</div>
-      <div class="sum-val" id="sumOpens">—</div>
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <div class="sum-val" id="sumOpens">—</div>
+        <div class="sum-trend" id="trendOpens"></div>
+      </div>
       <div class="sum-lbl">כניסות השבוע</div>
     </div>
   </div>
 
-  <!-- DEVICE BREAKDOWN — single line, moved above chart -->
+  <!-- SUMMARY CARDS — row 2: champions (wider) -->
+  <div class="summary-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:20px;">
+    <div class="sum-card" style="border-color:rgba(251,191,36,.3);background:linear-gradient(135deg,var(--surface),rgba(251,191,36,.04));">
+      <div style="font-size:22px;margin-bottom:4px;">🏆</div>
+      <div style="font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">הכי הרבה טיסות ביומן</div>
+      <div class="sum-val" id="sumTopUser" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--amber);">—</div>
+      <div class="sum-lbl" style="margin-top:4px;"><span id="sumTopFlights" style="color:var(--accent2);font-size:16px;font-weight:700;">—</span> טיסות בסה"כ</div>
+    </div>
+    <div class="sum-card" style="border-color:rgba(34,211,153,.2);background:linear-gradient(135deg,var(--surface),rgba(34,211,153,.04));">
+      <div style="font-size:22px;margin-bottom:4px;">✈</div>
+      <div style="font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">הכי הרבה טיסות שנרשמו</div>
+      <div class="sum-val" id="sumTopRecUser" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--cyan);">—</div>
+      <div class="sum-lbl" style="margin-top:4px;"><span id="sumTopRecorded" style="color:var(--cyan);font-size:16px;font-weight:700;">—</span> טיסות רשם דרך האפ</div>
+    </div>
+  </div>
+
+  <!-- DEVICE BREAKDOWN -->
   <div class="section" style="margin-bottom:16px;">
     <div class="sec-head">
       <div class="sec-title">📱 פילוח מכשירים</div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="deviceTotal"></div>
     </div>
     <div class="sec-body" style="padding:12px 16px;">
       <div id="deviceGrid"><div class="empty-state">טוען...</div></div>
@@ -530,10 +572,14 @@ body::before {
         <table class="users-table" id="usersTable">
           <thead>
             <tr>
-              <th>שם גיליון</th>
-              <th>טיסות</th>
-              <th>נראה לאחרונה</th>
-              <th>סה"כ כניסות</th>
+              <th onclick="sortUsers('name')" style="cursor:pointer;">שם גיליון <span id="sort-name" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('flights')" style="cursor:pointer;">סה״כ טיסות ביומן <span id="sort-flights" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('recorded')" style="cursor:pointer;">נרשמו דרך האפ <span id="sort-recorded" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('firstSeen')" style="cursor:pointer;">הצטרף <span id="sort-firstSeen" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('lastSeen')" style="cursor:pointer;">פעיל לאחרונה <span id="sort-lastSeen" class="sort-arrow">▼</span></th>
+              <th onclick="sortUsers('os')" style="cursor:pointer;">מערכת הפעלה <span id="sort-os" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('appVersion')" style="cursor:pointer;">גרסה <span id="sort-appVersion" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('opens')" style="cursor:pointer;">כניסות <span id="sort-opens" class="sort-arrow"></span></th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
@@ -566,6 +612,15 @@ body::before {
       <button class="feed-pill" onclick="setFeedFilter('flight_archived')" id="fp-flight_archived">🗄 ארכוב טיסה</button>
       <button class="feed-pill" onclick="setFeedFilter('setup_completed')" id="fp-setup_completed">🆕 הצטרפות</button>
     </div>
+    <!-- Row 2b: OS filter -->
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;direction:rtl;align-items:center;">
+      <span style="font-size:11px;color:var(--text3);align-self:center;">מערכת הפעלה:</span>
+      <button class="feed-pill active" onclick="setFeedOS('all')" id="fo-all">הכל</button>
+      <button class="feed-pill" onclick="setFeedOS('Android')" id="fo-Android">Android</button>
+      <button class="feed-pill" onclick="setFeedOS('iPhone')" id="fo-iPhone">iPhone</button>
+      <button class="feed-pill" onclick="setFeedOS('iPad')" id="fo-iPad">iPad</button>
+      <button class="feed-pill" onclick="setFeedOS('Desktop')" id="fo-Desktop">Desktop</button>
+    </div>
     <!-- Row 3: Range -->
     <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;direction:rtl;align-items:center;">
       <span style="font-size:11px;color:var(--text3);align-self:center;">טווח:</span>
@@ -580,43 +635,44 @@ body::before {
         <div class="empty-state" style="padding:24px 0;">טוען...</div>
       </div>
     </div>
-  <!-- CONNECTION ERRORS -->
-  <div class="section" style="border-color:rgba(251,146,60,.3);">
-    <div class="sec-head" onclick="toggleErrors()" style="cursor:pointer;background:linear-gradient(90deg,rgba(251,146,60,.08),var(--surface));">
-      <div class="sec-title" style="color:#fb923c;">🔴 שגיאות חיבור</div>
+  </div>
+
+  <!-- CONNECTION ERRORS — separate section -->
+  <div class="section" id="errorsSection" style="border-color:rgba(251,146,60,.3);">
+    <div class="sec-head" onclick="toggleErrors()" style="cursor:pointer;background:linear-gradient(90deg,rgba(251,146,60,.06),var(--surface));">
+      <div class="sec-title" style="color:#fb923c;">שגיאות חיבור</div>
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="errorsCount"></div>
-        <span id="errorsChevron" style="font-size:12px;color:var(--text3);transition:transform .2s;display:inline-block;">▼</span>
+        <span id="errorsBadge" style="display:none;font-size:10px;font-weight:700;font-family:var(--mono);background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.4);border-radius:20px;padding:2px 8px;"></span>
+        <span id="errorsChevron" style="font-size:12px;color:var(--text3);transition:transform .2s;display:inline-block;transform:rotate(-90deg);">▼</span>
       </div>
     </div>
-    <div id="errorsBody">
-      <div style="overflow-x:auto;">
-        <table class="users-table" id="errorsTable">
-          <thead>
-            <tr>
-              <th>זמן</th>
-              <th>אירוע</th>
-              <th>מכשיר</th>
-              <th>מערכת</th>
-              <th>דפדפן</th>
-              <th>מסך</th>
-              <th>PWA</th>
-              <th>רשת</th>
-              <th>שגיאה</th>
-            </tr>
-          </thead>
-          <tbody id="errorsTableBody">
-            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">טוען...</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div id="errorsBody" style="display:none;overflow-x:auto;">
+      <table class="users-table" id="errorsTable">
+        <thead>
+          <tr>
+            <th>זמן</th>
+            <th>אירוע</th>
+            <th>מכשיר</th>
+            <th>מערכת</th>
+            <th>דפדפן</th>
+            <th>מסך</th>
+            <th>PWA</th>
+            <th>רשת</th>
+            <th>שגיאה</th>
+          </tr>
+        </thead>
+        <tbody id="errorsTableBody">
+          <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">טוען...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v1.96.01 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.01 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
   <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;" id="debugLastTs"></div>
 </div>
@@ -627,6 +683,7 @@ const ADMIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbwMROMQAzdAz-dCNd
 let allEvents = [];
 let _feedFilter = 'all';
 let _feedRange  = 5;
+let _feedOS     = 'all';
 
 function setFeedFilter(f) {
   _feedFilter = f;
@@ -644,8 +701,16 @@ function setFeedRange(r) {
   renderFeed();
 }
 
+function setFeedOS(os) {
+  _feedOS = os;
+  document.querySelectorAll('[id^="fo-"]').forEach(el => el.classList.remove('active'));
+  const btn = document.getElementById('fo-' + os);
+  if (btn) btn.classList.add('active');
+  renderFeed();
+}
+
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v1.96';
+const ADMIN_VERSION = 'v2.01';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -759,16 +824,64 @@ function renderSummary() {
   const flightsTotal = allEvents.filter(e => e.event === 'flight_recorded').length;
   const newUsers     = allEvents.filter(e => e.event === 'setup_completed').length;
 
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const opensWeek = allEvents.filter(e => {
-    return e.event === 'app_open' && parseDate(e.timestamp) >= weekAgo;
+  const now     = new Date();
+  const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+  const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(now.getDate() - 14);
+
+  const opensThisWeek = allEvents.filter(e => e.event === 'app_open' && parseDate(e.timestamp) >= weekAgo).length;
+  const opensLastWeek = allEvents.filter(e => {
+    const t = parseDate(e.timestamp);
+    return e.event === 'app_open' && t >= twoWeeksAgo && t < weekAgo;
+  }).length;
+
+  const flightsThisWeek = allEvents.filter(e => e.event === 'flight_recorded' && parseDate(e.timestamp) >= weekAgo).length;
+  const flightsLastWeek = allEvents.filter(e => {
+    const t = parseDate(e.timestamp);
+    return e.event === 'flight_recorded' && t >= twoWeeksAgo && t < weekAgo;
   }).length;
 
   document.getElementById('sumUsers').textContent   = uniqueUsers;
   document.getElementById('sumFlights').textContent = flightsTotal;
   document.getElementById('sumNew').textContent     = newUsers;
-  document.getElementById('sumOpens').textContent   = opensWeek;
+  document.getElementById('sumOpens').textContent   = opensThisWeek;
+
+  // Trend arrows
+  function trendHTML(curr, prev) {
+    if (prev === 0 && curr === 0) return '<span class="trend-flat">—</span>';
+    if (curr > prev) return `<span class="trend-up">↑${curr - prev}</span>`;
+    if (curr < prev) return `<span class="trend-down">↓${prev - curr}</span>`;
+    return '<span class="trend-flat">—</span>';
+  }
+  const tO = document.getElementById('trendOpens');
+  const tF = document.getElementById('trendFlights');
+  if (tO) tO.innerHTML = trendHTML(opensThisWeek, opensLastWeek);
+  if (tF) tF.innerHTML = trendHTML(flightsThisWeek, flightsLastWeek);
+
+  // Most active user by logbook flights
+  const userFlights  = {};
+  const userRecorded = {};
+  const userNames    = {};
+  allEvents.forEach(e => {
+    if (!e.userId) return;
+    if (e.totalFlights)                userFlights[e.userId]  = Math.max(userFlights[e.userId] || 0, parseInt(e.totalFlights) || 0);
+    if (e.event === 'flight_recorded') userRecorded[e.userId] = (userRecorded[e.userId] || 0) + 1;
+    if (e.sheetName)                   userNames[e.userId]    = e.sheetName;
+  });
+
+  // Card 1: most logbook flights
+  const topLogbook = Object.entries(userFlights).sort((a, b) => b[1] - a[1])[0];
+  if (topLogbook) {
+    document.getElementById('sumTopUser').textContent    = userNames[topLogbook[0]] || topLogbook[0];
+    document.getElementById('sumTopFlights').textContent = topLogbook[1];
+  }
+
+  // Card 2: most recorded via app
+  const topRecorded = Object.entries(userRecorded).sort((a, b) => b[1] - a[1])[0];
+  if (topRecorded) {
+    const el = document.getElementById('sumTopRecUser');
+    if (el) el.textContent = userNames[topRecorded[0]] || topRecorded[0];
+    document.getElementById('sumTopRecorded').textContent = topRecorded[1];
+  }
 }
 
 // ── ACTIVITY CHART ────────────────────────────────────────────────
@@ -834,62 +947,104 @@ function renderChart() {
 }
 
 // ── USERS TABLE ─────────────────────────────────────────────────
+let _sortKey = 'lastSeen';
+let _sortDir = -1; // -1 = desc, 1 = asc
+let _usersData = [];
+
+function sortUsers(key) {
+  if (_sortKey === key) { _sortDir *= -1; }
+  else { _sortKey = key; _sortDir = -1; }
+  renderUsersTable();
+}
+
 function renderUsers() {
-  // Build per-user summary
   const users = {};
   allEvents.forEach(e => {
     const id = e.userId || 'unknown';
     if (!users[id]) {
       users[id] = {
         id,
-        name:      e.sheetName || '—',
-        device:    e.device    || '—',
-        os:        e.os        || '—',
-        flights:   0,
-        opens:     0,
-        lastSeen:  null
+        name:       e.sheetName || '—',
+        device:     e.device    || '—',
+        os:         e.os        || '—',
+        flights:    0,
+        recorded:   0,
+        opens:      0,
+        lastSeen:   null,
+        firstSeen:  null,
+        appVersion: '—',
       };
     }
-    // Update name to latest
-    if (e.sheetName) users[id].name = e.sheetName;
-    if (e.device)    users[id].device = e.device;
-    if (e.os)        users[id].os = e.os;
-    if (e.event === 'app_open') users[id].opens++;
-    if (e.event === 'flight_recorded') users[id].flights++;
-    // Track max flights in sheet
+    if (e.sheetName)  users[id].name   = e.sheetName;
+    if (e.device)     users[id].device = e.device;
+    if (e.os)         users[id].os     = e.os;
+    if (e.appVersion) users[id].appVersion = e.appVersion;
+    if (e.event === 'app_open')        users[id].opens++;
+    if (e.event === 'flight_recorded') users[id].recorded++;
     if (e.totalFlights) users[id].flights = Math.max(users[id].flights, parseInt(e.totalFlights) || 0);
 
     const ts = parseDate(e.timestamp);
-    if (!users[id].lastSeen || ts > users[id].lastSeen) users[id].lastSeen = ts;
+    if (!users[id].lastSeen  || ts > users[id].lastSeen)  users[id].lastSeen  = ts;
+    if (!users[id].firstSeen || ts < users[id].firstSeen) users[id].firstSeen = ts;
   });
 
-  const sorted = Object.values(users).sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
-  document.getElementById('usersCount').textContent = sorted.length + ' משתמשים';
+  _usersData = Object.values(users);
+  document.getElementById('usersCount').textContent = _usersData.length + ' משתמשים';
+  renderUsersTable();
+}
 
-  if (!sorted.length) {
+function renderUsersTable() {
+  if (!_usersData.length) {
     document.getElementById('usersTableBody').innerHTML =
-      '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3);">אין נתונים</td></tr>';
+      '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3);">אין נתונים</td></tr>';
     return;
   }
 
-  document.getElementById('usersTableBody').innerHTML = sorted.map(u => `
-    <tr>
+  // Update sort arrows
+  ['name','flights','recorded','firstSeen','lastSeen','os','appVersion','opens'].forEach(k => {
+    const el = document.getElementById('sort-' + k);
+    if (!el) return;
+    el.textContent = k === _sortKey ? (_sortDir === -1 ? '▼' : '▲') : '';
+  });
+
+  const maxFlights = Math.max(..._usersData.map(u => u.flights), 0);
+
+  const sorted = [..._usersData].sort((a, b) => {
+    let av = a[_sortKey], bv = b[_sortKey];
+    if (_sortKey === 'lastSeen' || _sortKey === 'firstSeen') {
+      av = av ? av.getTime() : 0;
+      bv = bv ? bv.getTime() : 0;
+    } else if (_sortKey === 'name' || _sortKey === 'appVersion' || _sortKey === 'os') {
+      av = String(av).toLowerCase();
+      bv = String(bv).toLowerCase();
+      return _sortDir * av.localeCompare(bv);
+    }
+    return _sortDir * ((bv > av ? 1 : bv < av ? -1 : 0));
+  });
+
+  document.getElementById('usersTableBody').innerHTML = sorted.map(u => {
+    const isTop    = u.flights > 0 && u.flights === maxFlights;
+    const rowStyle = isTop ? 'background:rgba(251,191,36,.05);' : '';
+    const nameCell = isTop ? `🏆 ${u.name}` : u.name;
+    return `<tr style="${rowStyle}">
       <td>
-        <div class="user-name">${u.name}</div>
+        <div class="user-name">${nameCell}</div>
         <div class="user-id">${u.id}</div>
       </td>
       <td><span class="flights-num">${u.flights}</span></td>
-      <td><span class="last-seen">${u.lastSeen ? fmtRelative(u.lastSeen) : '—'}</span></td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--text3);">${u.opens}</td>
-    </tr>
-  `).join('');
+      <td><span class="flights-num" style="color:var(--cyan);">${u.recorded}</span></td>
+      <td><span class="last-seen" style="color:var(--text2);">${u.firstSeen ? u.firstSeen.toLocaleDateString('he-IL') : '—'}</span></td>
+      <td><span class="last-seen" style="color:var(--text2);">${u.lastSeen ? fmtRelative(u.lastSeen) : '—'}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">${u.os || '—'}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">${u.appVersion}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">${u.opens}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ── DEVICE BREAKDOWN ────────────────────────────────────────────
 function renderDevices() {
   const counts = {};
-
-  // Count ALL events per device type (not just unique users)
   allEvents.forEach(e => {
     if (!e.device) return;
     const type = getDeviceType(e.device);
@@ -898,6 +1053,9 @@ function renderDevices() {
 
   const total  = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  const totalEl = document.getElementById('deviceTotal');
+  if (totalEl) totalEl.textContent = total + ' אירועים';
 
   if (!sorted.length) {
     document.getElementById('deviceGrid').innerHTML = '<div class="empty-state">אין נתונים</div>';
@@ -912,40 +1070,37 @@ function renderDevices() {
     'Unknown': '#4a6f96'
   };
 
-  // Single stacked bar
-  const segments = sorted.map(([type, count]) => {
+  document.getElementById('deviceGrid').innerHTML = sorted.map(([type, count]) => {
     const pct   = Math.round(count / total * 100);
     const color = colors[type] || '#4a6f96';
-    return `<div style="width:${pct}%;background:${color};height:100%;transition:width .6s ease;" title="${type}: ${pct}% (${count})"></div>`;
+    return `
+      <div class="device-row" style="margin-bottom:8px;">
+        <div style="width:80px;flex-shrink:0;">
+          <span style="font-size:12px;color:var(--text2);font-family:var(--mono);font-weight:600;">${type}</span>
+        </div>
+        <div class="device-bar-wrap" style="flex:1;">
+          <div class="device-bar-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+        <div style="width:36px;text-align:left;flex-shrink:0;font-size:12px;font-family:var(--mono);color:var(--text2);">${count}</div>
+        <div style="width:34px;text-align:left;flex-shrink:0;font-size:11px;font-family:var(--mono);color:${color};font-weight:700;">${pct}%</div>
+      </div>`;
   }).join('');
-
-  // Legend
-  const legend = sorted.map(([type, count]) => {
-    const pct   = Math.round(count / total * 100);
-    const color = colors[type] || '#4a6f96';
-    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);font-family:var(--mono);">
-      <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>
-      ${type} ${pct}%
-    </span>`;
-  }).join('');
-
-  document.getElementById('deviceGrid').innerHTML = `
-    <div style="height:14px;border-radius:8px;overflow:hidden;display:flex;background:var(--raised);border:1px solid var(--border);margin-bottom:10px;">
-      ${segments}
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;direction:ltr;justify-content:center;">${legend}</div>
-  `;
 }
 
 // ── ACTIVITY FEED ────────────────────────────────────────────────
 function renderFeed() {
   let events = [...allEvents].sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
 
-  // Apply user filter — strict userId match
+  // Apply user filter
   const userSel = document.getElementById('feedUserFilter');
   const userFilter = userSel ? userSel.value.trim() : 'all';
   if (userFilter !== 'all') {
     events = events.filter(e => (e.userId || '').trim() === userFilter);
+  }
+
+  // Apply OS filter
+  if (_feedOS !== 'all') {
+    events = events.filter(e => getDeviceType(e.device) === _feedOS);
   }
 
   // Apply event type filter
@@ -992,7 +1147,7 @@ function renderFeed() {
       <div class="feed-dot ${dotClass[e.event] || 'fd-open'}"></div>
       <div class="feed-content">
         <div class="feed-event">${eventLabels[e.event] || e.event}</div>
-        <div class="feed-meta">${e.sheetName || '—'} · ${e.device || '—'}</div>
+        <div class="feed-meta">${e.sheetName || '—'} · ${e.device || '—'} · ${e.os || '—'}</div>
       </div>
       <div class="feed-time">${fmtRelative(parseDate(e.timestamp))}</div>
     </div>
@@ -1004,23 +1159,22 @@ function parseDate(str) {
   if (!str) return new Date(0);
   str = String(str).trim();
 
-  // Format 1: dd/MM/yyyy HH:mm:ss (our standard GAS format)
-  const m1 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);
-  if (m1) return new Date(m1[3], m1[2]-1, m1[1], m1[4], m1[5]);
+  // New format (v5.1+): yyyy-MM-dd HH:mm:ss
+  const iso = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (iso) return new Date(
+    parseInt(iso[1]), parseInt(iso[2]) - 1, parseInt(iso[3]),
+    parseInt(iso[4]), parseInt(iso[5]), parseInt(iso[6] || 0)
+  );
 
-  // Format 2: MM/dd/yyyy (US format fallback)
-  const m2 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m2) {
-    // Distinguish dd/MM vs MM/dd by checking if first number > 12
-    const a = parseInt(m2[1]), b = parseInt(m2[2]);
-    if (a > 12) return new Date(m2[3], b-1, a); // must be dd/MM
-    return new Date(m2[3], a-1, b); // assume MM/dd
-  }
+  // Legacy format (v5): dd/MM/yyyy HH:mm:ss
+  const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (dmy) return new Date(
+    parseInt(dmy[3]), parseInt(dmy[2]) - 1, parseInt(dmy[1]),
+    parseInt(dmy[4]), parseInt(dmy[5]), parseInt(dmy[6] || 0)
+  );
 
-  // Format 3: ISO or any other — let JS try
   const d = new Date(str);
   if (!isNaN(d.getTime())) return d;
-
   return new Date(0);
 }
 
@@ -1071,7 +1225,7 @@ function toggleUsers() {
   chevron.style.transform = _usersOpen ? '' : 'rotate(-90deg)';
 }
 
-let _errorsOpen = true;
+let _errorsOpen = false;
 function toggleErrors() {
   _errorsOpen = !_errorsOpen;
   const body    = document.getElementById('errorsBody');
@@ -1085,10 +1239,21 @@ function renderErrors() {
     .filter(e => e.event === 'connection_error' || e.event === 'connection_success')
     .sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
 
-  const count = errorEvents.filter(e => e.event === 'connection_error').length;
+  const count        = errorEvents.filter(e => e.event === 'connection_error').length;
   const successCount = errorEvents.filter(e => e.event === 'connection_success').length;
   document.getElementById('errorsCount').textContent =
     `${count} שגיאות · ${successCount} הצלחות`;
+
+  // Show badge on header if there are errors (even while collapsed)
+  const badge = document.getElementById('errorsBadge');
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count + ' שגיאות';
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   if (!errorEvents.length) {
     document.getElementById('errorsTableBody').innerHTML =
