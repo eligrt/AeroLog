@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -256,10 +256,11 @@ body::before {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  direction: rtl;
+  direction: ltr;
+  text-align: left;
 }
 .users-table th {
-  text-align: right;
+  text-align: left;
   padding: 8px 10px;
   font-size: 10px;
   font-weight: 700;
@@ -325,6 +326,7 @@ body::before {
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
   direction: ltr;
+  text-align: left;
 }
 .feed-item:last-child { border-bottom: none; }
 .feed-dot {
@@ -340,7 +342,7 @@ body::before {
 .feed-content {
   flex: 1;
   min-width: 0;
-  direction: rtl;
+  direction: ltr;
 }
 .feed-event {
   font-size: 12px;
@@ -433,6 +435,59 @@ body::before {
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--mono);
+  letter-spacing: .04em;
+  transition: color .15s;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── BADGES ── */
+.podium-wrap { display: flex; align-items: flex-end; justify-content: center; gap: 10px; height: 160px; direction: ltr; }
+.podium-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 120px; }
+.podium-name { font-size: 12px; font-weight: 600; color: var(--text); text-align: center; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 118px; direction: rtl; }
+.podium-count { font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 6px; font-family: var(--mono); }
+.podium-block { width: 100%; border-radius: 6px 6px 0 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.p1 { height: 90px; background: linear-gradient(180deg, #b8860b, #8B6914); border: 1px solid #d4a017; }
+.p2 { height: 65px; background: linear-gradient(180deg, #808080, #606060); border: 1px solid #9e9e9e; }
+.p3 { height: 45px; background: linear-gradient(180deg, #8B5A2B, #6B3F1A); border: 1px solid #a0522d; }
+.badge-sm { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 12px; }
+.badge-sm-head { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--raised); display: flex; align-items: center; gap: 10px; }
+.badge-sm-icon { font-size: 18px; flex-shrink: 0; }
+.badge-sm-title { font-size: 13px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+.badge-sm-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.badge-sm-table { width: 100%; border-collapse: collapse; }
+.badge-sm-table tr td { padding: 9px 14px; font-size: 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.badge-sm-table tr:last-child td { border-bottom: none; }
+.badge-sm-table tr.bwinner td { background: rgba(251,191,36,.04); }
+.bmedal { font-size: 16px; width: 28px; }
+.bname { font-weight: 600; color: var(--text); }
+.bval { text-align: right; color: var(--text3); font-family: var(--mono); font-size: 11px; }
+
 /* ── FOOTER ── */
 .admin-footer {
   text-align: center;
@@ -455,7 +510,7 @@ body::before {
   </div>
   <div class="header-right">
     <button class="btn-refresh" id="btnRefresh" onclick="loadAll()">
-      <span id="refreshIcon">↻</span> רענן
+      <span id="refreshIcon">↻</span> Refresh
     </button>
   </div>
 </div>
@@ -463,7 +518,7 @@ body::before {
 <!-- LOADING SPLASH -->
 <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(6,14,10,.85);z-index:99;backdrop-filter:blur(3px);align-items:center;justify-content:center;flex-direction:column;gap:16px;">
   <div style="font-size:24px;animation:spin .8s linear infinite;color:var(--accent2);">↻</div>
-  <div style="font-family:var(--mono);font-size:13px;color:var(--accent2);" id="loadingMsg">טוען נתונים...</div>
+  <div style="font-family:var(--mono);font-size:13px;color:var(--accent2);" id="loadingMsg">Loading data...</div>
   <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="loadingVersion"></div>
   <!-- Progress bar — LTR, left to right like a real progress indicator -->
   <div style="width:240px;height:6px;background:var(--raised);border-radius:10px;overflow:hidden;border:1px solid var(--border);direction:ltr;">
@@ -475,215 +530,263 @@ body::before {
 <!-- PAGE -->
 <div class="page">
 
-  <!-- SUMMARY CARDS — row 1: stats -->
-  <div class="summary-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:10px;">
-    <div class="sum-card">
-      <div class="sum-icon">👥</div>
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <div class="sum-val" id="sumUsers">—</div>
-        <div class="sum-trend" id="trendUsers"></div>
-      </div>
-      <div class="sum-lbl">משתמשים רשומים</div>
-    </div>
-    <div class="sum-card c-cyan">
-      <div class="sum-icon">✈</div>
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <div class="sum-val" id="sumFlights">—</div>
-        <div class="sum-trend" id="trendFlights"></div>
-      </div>
-      <div class="sum-lbl">טיסות נרשמו באפ</div>
-    </div>
-    <div class="sum-card c-amber">
-      <div class="sum-icon">🆕</div>
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <div class="sum-val" id="sumNew">—</div>
-        <div class="sum-trend" id="trendNew"></div>
-      </div>
-      <div class="sum-lbl">התקנות</div>
-    </div>
-    <div class="sum-card c-blue">
-      <div class="sum-icon">📲</div>
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <div class="sum-val" id="sumOpens">—</div>
-        <div class="sum-trend" id="trendOpens"></div>
-      </div>
-      <div class="sum-lbl">כניסות השבוע</div>
-    </div>
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview')"  id="tab-overview">Overview</button>
+    <button class="tab-btn"        onclick="switchTab('users')"     id="tab-users">Users</button>
+    <button class="tab-btn"        onclick="switchTab('activity')"  id="tab-activity">Activity Log</button>
+    <button class="tab-btn"        onclick="switchTab('badges')"    id="tab-badges">Badges</button>
   </div>
 
-  <!-- SUMMARY CARDS — row 2: champions (wider) -->
-  <div class="summary-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:20px;">
-    <div class="sum-card" style="border-color:rgba(251,191,36,.35);background:linear-gradient(135deg,var(--surface),rgba(251,191,36,.06));">
-      <div style="display:flex;gap:4px;font-size:20px;margin-bottom:4px;">🏆✈️</div>
-      <div style="font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.08em;margin-bottom:6px;font-family:var(--mono);">AirLog CAPTAIN</div>
-      <div class="sum-val" id="sumTopUser" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--amber);">—</div>
-      <div style="margin-top:6px;font-size:11px;color:var(--text3);">יומן עם <span id="sumTopFlights" style="color:var(--accent2);font-weight:700;">—</span> טיסות</div>
-    </div>
-    <div class="sum-card" style="border-color:rgba(168,208,250,.25);background:linear-gradient(135deg,var(--surface),rgba(168,208,250,.04));">
-      <div style="display:flex;gap:4px;font-size:20px;margin-bottom:4px;">🏅✍️</div>
-      <div style="font-size:12px;font-weight:700;color:var(--accent2);letter-spacing:.08em;margin-bottom:6px;font-family:var(--mono);">AirLog TOP LOGGER</div>
-      <div class="sum-val" id="sumTopRecUser" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accent2);">—</div>
-      <div style="margin-top:6px;font-size:11px;color:var(--text3);">רשם <span id="sumTopRecorded" style="color:var(--cyan);font-weight:700;">—</span> טיסות דרך האפ</div>
-    </div>
-  </div>
+  <!-- ═══════════════════════════════════════════════════════
+       TAB: OVERVIEW
+  ══════════════════════════════════════════════════════════ -->
+  <div class="tab-panel active" id="panel-overview">
 
-  <!-- DEVICE BREAKDOWN -->
-  <div class="section" style="margin-bottom:16px;">
-    <div class="sec-head">
-      <div class="sec-title">📱 פילוח מכשירים</div>
-      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="deviceTotal"></div>
-    </div>
-    <div class="sec-body" style="padding:12px 16px;">
-      <div id="deviceGrid"><div class="empty-state">טוען...</div></div>
-    </div>
-  </div>
-
-  <!-- ACTIVITY CHART -->
-  <div class="section">
-    <div class="sec-head">
-      <div class="sec-title">📈 פעילות אחרונה</div>
-      <div style="display:flex;gap:4px;">
-        <button class="feed-pill" id="chart-7" onclick="setChartDays(7)" style="padding:3px 8px;font-size:10px;">7 ימים</button>
-        <button class="feed-pill active" id="chart-14" onclick="setChartDays(14)" style="padding:3px 8px;font-size:10px;">14 ימים</button>
+    <!-- SUMMARY CARDS row 1 -->
+    <div class="summary-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:10px;">
+      <div class="sum-card">
+        <div class="sum-icon">👥</div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <div class="sum-val" id="sumUsers">—</div>
+          <div class="sum-trend" id="trendUsers"></div>
+        </div>
+        <div class="sum-lbl">Registered Users</div>
+      </div>
+      <div class="sum-card c-cyan">
+        <div class="sum-icon">✈</div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <div class="sum-val" id="sumFlights">—</div>
+          <div class="sum-trend" id="trendFlights"></div>
+        </div>
+        <div class="sum-lbl">Flights Logged via App</div>
+      </div>
+      <div class="sum-card c-amber">
+        <div class="sum-icon">🆕</div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <div class="sum-val" id="sumNew">—</div>
+          <div class="sum-trend" id="trendNew"></div>
+        </div>
+        <div class="sum-lbl">Installs</div>
+      </div>
+      <div class="sum-card c-blue">
+        <div class="sum-icon">📲</div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <div class="sum-val" id="sumOpens">—</div>
+          <div class="sum-trend" id="trendOpens"></div>
+        </div>
+        <div class="sum-lbl">Opens This Week</div>
       </div>
     </div>
-    <div class="sec-body">
-      <div class="chart-wrap" id="activityChart" style="height:120px;align-items:flex-end;">
-        <div class="empty-state" style="width:100%;">טוען...</div>
+
+    <!-- DEVICE BREAKDOWN -->
+    <div class="section" style="margin-bottom:16px;">
+      <div class="sec-head">
+        <div class="sec-title">Device Breakdown</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="deviceTotal"></div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;direction:ltr;justify-content:center;">
-        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#34d399;display:inline-block;"></span>רישום טיסה</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#60a5fa;display:inline-block;"></span>כניסה</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#f87171;display:inline-block;"></span>ארכוב</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#fbbf24;display:inline-block;"></span>הצטרפות</span>
+      <div class="sec-body" style="padding:12px 16px;">
+        <div id="deviceGrid"><div class="empty-state">Loading...</div></div>
       </div>
     </div>
+
+    <!-- ACTIVITY CHART -->
+    <div class="section" style="margin-bottom:16px;">
+      <div class="sec-head">
+        <div class="sec-title">Activity</div>
+        <div style="display:flex;gap:4px;">
+          <button class="feed-pill" id="chart-7" onclick="setChartDays(7)" style="padding:3px 8px;font-size:10px;">7 days</button>
+          <button class="feed-pill active" id="chart-14" onclick="setChartDays(14)" style="padding:3px 8px;font-size:10px;">14 days</button>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="chart-wrap" id="activityChart" style="height:120px;align-items:flex-end;">
+          <div class="empty-state" style="width:100%;">Loading...</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;direction:ltr;justify-content:center;">
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#34d399;display:inline-block;"></span>Flight logged</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#60a5fa;display:inline-block;"></span>App open</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#f87171;display:inline-block;"></span>Archived</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);"><span style="width:8px;height:8px;border-radius:2px;background:#fbbf24;display:inline-block;"></span>New install</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTION ERRORS -->
+    <div class="section" id="errorsSection" style="border-color:rgba(251,146,60,.3);">
+      <div class="sec-head" onclick="toggleErrors()" style="cursor:pointer;background:linear-gradient(90deg,rgba(251,146,60,.06),var(--surface));">
+        <div class="sec-title" style="color:#fb923c;">Connection Errors</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="errorsCount"></div>
+          <span id="errorsBadge" style="display:none;font-size:10px;font-weight:700;font-family:var(--mono);background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.4);border-radius:20px;padding:2px 8px;"></span>
+          <span id="errorsChevron" style="font-size:12px;color:var(--text3);transition:transform .2s;display:inline-block;transform:rotate(-90deg);">▼</span>
+        </div>
+      </div>
+      <div id="errorsBody" style="display:none;overflow-x:auto;">
+        <table class="users-table" id="errorsTable">
+          <thead>
+            <tr>
+              <th>Time</th><th>Event</th><th>Device</th><th>OS</th>
+              <th>Browser</th><th>Screen</th><th>PWA</th><th>Network</th><th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="errorsTableBody">
+            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 
-  <!-- USERS TABLE -->
-  <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px;" id="midGrid">
+  <!-- ═══════════════════════════════════════════════════════
+       TAB: USERS
+  ══════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-users">
     <div class="section">
       <div class="sec-head" onclick="toggleUsers()" style="cursor:pointer;">
-        <div class="sec-title">👤 משתמשים</div>
+        <div class="sec-title">Users</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="usersCount"></div>
           <span id="usersChevron" style="font-size:12px;color:var(--text3);transition:transform .2s;display:inline-block;">▼</span>
         </div>
       </div>
-      <div id="usersBody" style="overflow-x:auto;">
+      <div id="usersBody" style="overflow-x:auto;direction:ltr;">
         <table class="users-table" id="usersTable">
           <thead>
             <tr>
-              <th onclick="sortUsers('name')" style="cursor:pointer;">שם גיליון <span id="sort-name" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('flights')" style="cursor:pointer;">סה״כ טיסות ביומן <span id="sort-flights" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('recorded')" style="cursor:pointer;">נרשמו דרך האפ <span id="sort-recorded" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('firstSeen')" style="cursor:pointer;">הצטרף <span id="sort-firstSeen" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('lastSeen')" style="cursor:pointer;">פעיל לאחרונה <span id="sort-lastSeen" class="sort-arrow">▼</span></th>
-              <th onclick="sortUsers('os')" style="cursor:pointer;">מערכת הפעלה <span id="sort-os" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('appVersion')" style="cursor:pointer;">גרסה <span id="sort-appVersion" class="sort-arrow"></span></th>
-              <th onclick="sortUsers('opens')" style="cursor:pointer;">כניסות <span id="sort-opens" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('name')" style="cursor:pointer;">Sheet Name <span id="sort-name" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('lastSeen')" style="cursor:pointer;">Last Active <span id="sort-lastSeen" class="sort-arrow">▼</span></th>
+              <th onclick="sortUsers('flights')" style="cursor:pointer;">Total in Sheet <span id="sort-flights" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('recorded')" style="cursor:pointer;">Recorded via AirLog <span id="sort-recorded" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('opens')" style="cursor:pointer;">Opens <span id="sort-opens" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('os')" style="cursor:pointer;">OS <span id="sort-os" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('appVersion')" style="cursor:pointer;">Version <span id="sort-appVersion" class="sort-arrow"></span></th>
+              <th onclick="sortUsers('firstSeen')" style="cursor:pointer;">Joined <span id="sort-firstSeen" class="sort-arrow"></span></th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3);">טוען...</td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">Loading...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- RECENT ACTIVITY FEED -->
-  <div class="section">
-    <div class="sec-head">
-      <div class="sec-title">⚡ פעילות אחרונה</div>
-      <button class="feed-pill" onclick="resetFeedFilters()" style="font-size:10px;padding:3px 10px;color:var(--text3);border-color:var(--border);">↺ איפוס סינון</button>
-    </div>
-    <!-- Row 1: User -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">משתמש</div>
-      <select id="feedUserFilter" onchange="renderFeed()"
-        style="font-family:var(--sans);font-size:12px;background:var(--raised);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer;width:100%;">
-        <option value="all">כולם</option>
-      </select>
-    </div>
-    <!-- Row 2: Event type -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">סוג אירוע</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button class="feed-pill active" onclick="setFeedFilter('all')" id="fp-all">הכל</button>
-        <button class="feed-pill" onclick="setFeedFilter('flight_recorded')" id="fp-flight_recorded">רישום טיסה</button>
-        <button class="feed-pill" onclick="setFeedFilter('app_open')" id="fp-app_open">כניסות</button>
-        <button class="feed-pill" onclick="setFeedFilter('flight_archived')" id="fp-flight_archived">ארכוב טיסה</button>
-        <button class="feed-pill" onclick="setFeedFilter('setup_completed')" id="fp-setup_completed">הצטרפות</button>
+  <!-- ═══════════════════════════════════════════════════════
+       TAB: ACTIVITY LOG
+  ══════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-activity">
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-title">Activity Log</div>
+        <button class="feed-pill" onclick="resetFeedFilters()" style="font-size:10px;padding:3px 10px;color:var(--text3);border-color:var(--border);">↺ Reset filters</button>
       </div>
-    </div>
-    <!-- Row 2b: OS filter -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">מערכת הפעלה</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button class="feed-pill active" onclick="setFeedOS('all')" id="fo-all">הכל</button>
-        <button class="feed-pill" onclick="setFeedOS('Android')" id="fo-Android">Android</button>
-        <button class="feed-pill" onclick="setFeedOS('iPhone')" id="fo-iPhone">iPhone</button>
-        <button class="feed-pill" onclick="setFeedOS('iPad')" id="fo-iPad">iPad</button>
-        <button class="feed-pill" onclick="setFeedOS('Desktop')" id="fo-Desktop">Desktop</button>
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">User</div>
+        <select id="feedUserFilter" onchange="renderFeed()"
+          style="font-family:var(--sans);font-size:12px;background:var(--raised);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer;width:100%;">
+          <option value="all">All users</option>
+        </select>
       </div>
-    </div>
-    <!-- Row 3: Range -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">טווח</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button class="feed-pill active" onclick="setFeedRange(5)"  id="fr-5">5 אחרונים</button>
-        <button class="feed-pill" onclick="setFeedRange(20)" id="fr-20">20 אחרונים</button>
-        <button class="feed-pill" onclick="setFeedRange(30)" id="fr-30">חודש</button>
-        <button class="feed-pill" onclick="setFeedRange(90)" id="fr-90">3 חודשים</button>
-        <button class="feed-pill" onclick="setFeedRange(0)"  id="fr-0">הכל</button>
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">Event Type</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="feed-pill active" onclick="setFeedFilter('all')" id="fp-all">All</button>
+          <button class="feed-pill" onclick="setFeedFilter('flight_recorded')" id="fp-flight_recorded">Flight logged</button>
+          <button class="feed-pill" onclick="setFeedFilter('app_open')" id="fp-app_open">App open</button>
+          <button class="feed-pill" onclick="setFeedFilter('flight_archived')" id="fp-flight_archived">Archived</button>
+          <button class="feed-pill" onclick="setFeedFilter('setup_completed')" id="fp-setup_completed">New install</button>
+        </div>
       </div>
-    </div>
-    <div class="sec-body" style="padding:0 16px;">
-      <div class="feed-list" id="feedList">
-        <div class="empty-state" style="padding:24px 0;">טוען...</div>
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">Platform</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="feed-pill active" onclick="setFeedOS('all')" id="fo-all">All</button>
+          <button class="feed-pill" onclick="setFeedOS('Android')" id="fo-Android">Android</button>
+          <button class="feed-pill" onclick="setFeedOS('iPhone')" id="fo-iPhone">iPhone</button>
+          <button class="feed-pill" onclick="setFeedOS('iPad')" id="fo-iPad">iPad</button>
+          <button class="feed-pill" onclick="setFeedOS('Desktop')" id="fo-Desktop">Desktop</button>
+        </div>
+      </div>
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">Mode</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="feed-pill active" onclick="setFeedPWA('all')" id="fw-all">All</button>
+          <button class="feed-pill" onclick="setFeedPWA('yes')" id="fw-yes">Installed (PWA)</button>
+          <button class="feed-pill" onclick="setFeedPWA('no')" id="fw-no">Browser</button>
+        </div>
+      </div>
+      <div style="padding:8px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">Range</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="feed-pill active" onclick="setFeedRange(5)"  id="fr-5">Last 5</button>
+          <button class="feed-pill" onclick="setFeedRange(20)" id="fr-20">Last 20</button>
+          <button class="feed-pill" onclick="setFeedRange(30)" id="fr-30">30 days</button>
+          <button class="feed-pill" onclick="setFeedRange(90)" id="fr-90">90 days</button>
+          <button class="feed-pill" onclick="setFeedRange(0)"  id="fr-0">All</button>
+        </div>
+      </div>
+      <div class="sec-body" style="padding:0 16px;">
+        <div class="feed-list" id="feedList">
+          <div class="empty-state" style="padding:24px 0;">Loading...</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- CONNECTION ERRORS — separate section -->
-  <div class="section" id="errorsSection" style="border-color:rgba(251,146,60,.3);">
-    <div class="sec-head" onclick="toggleErrors()" style="cursor:pointer;background:linear-gradient(90deg,rgba(251,146,60,.06),var(--surface));">
-      <div class="sec-title" style="color:#fb923c;">שגיאות חיבור</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);" id="errorsCount"></div>
-        <span id="errorsBadge" style="display:none;font-size:10px;font-weight:700;font-family:var(--mono);background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.4);border-radius:20px;padding:2px 8px;"></span>
-        <span id="errorsChevron" style="font-size:12px;color:var(--text3);transition:transform .2s;display:inline-block;transform:rotate(-90deg);">▼</span>
+  <!-- ═══════════════════════════════════════════════════════
+       TAB: BADGES
+  ══════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-badges">
+
+    <!-- PODIUM 1: Top Logger (all time) -->
+    <div class="section" style="margin-bottom:16px;">
+      <div class="sec-head">
+        <div class="sec-title">🏅✍️ AirLog TOP LOGGER</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">most flights logged via app · all time</div>
+      </div>
+      <div class="sec-body" style="padding:20px 16px 0;">
+        <div class="podium-wrap" id="podiumWrap">
+          <div class="empty-state" style="width:100%;padding-bottom:20px;">Loading...</div>
+        </div>
       </div>
     </div>
-    <div id="errorsBody" style="display:none;overflow-x:auto;">
-      <table class="users-table" id="errorsTable">
-        <thead>
-          <tr>
-            <th>זמן</th>
-            <th>אירוע</th>
-            <th>מכשיר</th>
-            <th>מערכת</th>
-            <th>דפדפן</th>
-            <th>מסך</th>
-            <th>PWA</th>
-            <th>רשת</th>
-            <th>שגיאה</th>
-          </tr>
-        </thead>
-        <tbody id="errorsTableBody">
-          <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">טוען...</td></tr>
-        </tbody>
+
+    <!-- PODIUM 2: Most Active last 30 days -->
+    <div class="section" style="margin-bottom:16px;">
+      <div class="sec-head">
+        <div class="sec-title">🗓️ Most Active</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">most flights logged · last 30 days</div>
+      </div>
+      <div class="sec-body" style="padding:20px 16px 0;">
+        <div class="podium-wrap" id="podiumMonthWrap">
+          <div class="empty-state" style="width:100%;padding-bottom:20px;">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE: Most Recent (last 5 flight events) -->
+    <div class="badge-sm" id="badgeRecent">
+      <div class="badge-sm-head">
+        <div class="badge-sm-icon">⚡</div>
+        <div>
+          <div class="badge-sm-title">Most Recent</div>
+          <div class="badge-sm-sub">last 5 flights logged via app</div>
+        </div>
+      </div>
+      <table class="badge-sm-table" id="badgeRecentTable">
+        <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3);">Loading...</td></tr>
       </table>
     </div>
+
   </div>
 
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.05 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.14 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;" id="debugLastTs"></div>
 </div>
 
 <script>
@@ -693,6 +796,7 @@ let allEvents = [];
 let _feedFilter = 'all';
 let _feedRange  = 5;
 let _feedOS     = 'all';
+let _feedPWA    = 'all';
 
 function setFeedFilter(f) {
   _feedFilter = f;
@@ -718,26 +822,31 @@ function setFeedOS(os) {
   renderFeed();
 }
 
+function setFeedPWA(val) {
+  _feedPWA = val;
+  document.querySelectorAll('[id^="fw-"]').forEach(el => el.classList.remove('active'));
+  const btn = document.getElementById('fw-' + val);
+  if (btn) btn.classList.add('active');
+  renderFeed();
+}
+
 function resetFeedFilters() {
-  // Reset event type
   _feedFilter = 'all';
   document.querySelectorAll('[id^="fp-"]').forEach(el => el.classList.remove('active'));
-  const fpAll = document.getElementById('fp-all');
-  if (fpAll) fpAll.classList.add('active');
+  document.getElementById('fp-all')?.classList.add('active');
 
-  // Reset OS
   _feedOS = 'all';
   document.querySelectorAll('[id^="fo-"]').forEach(el => el.classList.remove('active'));
-  const foAll = document.getElementById('fo-all');
-  if (foAll) foAll.classList.add('active');
+  document.getElementById('fo-all')?.classList.add('active');
 
-  // Reset range to default (5)
+  _feedPWA = 'all';
+  document.querySelectorAll('[id^="fw-"]').forEach(el => el.classList.remove('active'));
+  document.getElementById('fw-all')?.classList.add('active');
+
   _feedRange = 5;
   document.querySelectorAll('[id^="fr-"]').forEach(el => el.classList.remove('active'));
-  const frDef = document.getElementById('fr-5');
-  if (frDef) frDef.classList.add('active');
+  document.getElementById('fr-5')?.classList.add('active');
 
-  // Reset user dropdown
   const userSel = document.getElementById('feedUserFilter');
   if (userSel) userSel.value = 'all';
 
@@ -745,7 +854,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.05';
+const ADMIN_VERSION = 'v2.14';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -764,12 +873,11 @@ async function loadAll() {
   barFill.style.width = '0%';
   if (pct) pct.textContent = '0%';
 
-  // Animated steps while waiting
   const steps = [
-    { p: 15, txt: 'מתחבר לשרת...' },
-    { p: 35, txt: 'מושך נתוני אירועים...' },
-    { p: 60, txt: 'מעבד רשומות...' },
-    { p: 80, txt: 'כמעט מוכן...' },
+    { p: 15, txt: 'Connecting...' },
+    { p: 35, txt: 'Fetching events...' },
+    { p: 60, txt: 'Processing records...' },
+    { p: 80, txt: 'Almost ready...' },
   ];
   let stepIdx = 0;
   let done = false;
@@ -788,16 +896,10 @@ async function loadAll() {
     const data = await res.json();
     allEvents  = data.events || [];
     done = true;
-    if (msg) msg.textContent = 'מרנדר...';
+    if (msg) msg.textContent = 'Rendering...';
     barFill.style.width = '95%';
     if (pct) pct.textContent = '95%';
     render();
-    // Debug: show last 3 raw timestamps
-    const dbg = document.getElementById('debugLastTs');
-    if (dbg && allEvents.length) {
-      const last3 = [...allEvents].sort((a,b) => parseDate(b.timestamp)-parseDate(a.timestamp)).slice(0,3);
-      dbg.textContent = 'Last: ' + last3.map(e => e.timestamp).join(' | ');
-    }
     barFill.style.transition = 'width .15s ease';
     barFill.style.width = '100%';
     if (pct) pct.textContent = '100%';
@@ -805,25 +907,35 @@ async function loadAll() {
     const now = new Date();
     const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const footer = document.getElementById('footerUpdateTime');
-    if (footer) footer.textContent = '· עודכן ' + timeStr;
+    if (footer) footer.textContent = '· updated ' + timeStr;
   } catch(e) {
     done = true;
     barFill.style.background = 'var(--red)';
     barFill.style.width = '100%';
     if (pct) pct.textContent = '⚠';
-    if (msg) msg.textContent = 'שגיאת טעינה';
+    if (msg) msg.textContent = 'Load error';
     setTimeout(() => {
       overlay.style.display = 'none';
       barFill.style.background = '';
       barFill.style.width = '0%';
     }, 2000);
     const ft = document.getElementById('footerUpdateTime');
-    if (ft) ft.textContent = '· ⚠ שגיאת טעינה';
+    if (ft) ft.textContent = '· ⚠ load error';
     console.error(e);
   }
 
   btn.classList.remove('loading');
   icon.classList.remove('spin');
+}
+
+// ── TAB SWITCHING ────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const btn = document.getElementById('tab-' + name);
+  const panel = document.getElementById('panel-' + name);
+  if (btn) btn.classList.add('active');
+  if (panel) panel.classList.add('active');
 }
 
 // ── RENDER ALL ──────────────────────────────────────────────────
@@ -835,6 +947,7 @@ function render() {
   populateUserDropdown();
   renderFeed();
   renderErrors();
+  renderBadges();
 }
 
 function populateUserDropdown() {
@@ -846,7 +959,7 @@ function populateUserDropdown() {
   allEvents.forEach(e => {
     if (e.userId && e.sheetName) users[e.userId.trim()] = e.sheetName;
   });
-  sel.innerHTML = '<option value="all">כולם</option>' +
+  sel.innerHTML = '<option value="all">All users</option>' +
     Object.entries(users).map(([id, name]) =>
       `<option value="${id.trim()}">${name}</option>`
     ).join('');
@@ -891,37 +1004,79 @@ function renderSummary() {
   const tF = document.getElementById('trendFlights');
   if (tO) tO.innerHTML = trendHTML(opensThisWeek, opensLastWeek);
   if (tF) tF.innerHTML = trendHTML(flightsThisWeek, flightsLastWeek);
+}
 
-  const userFlights     = {}; // most recent totalFlights per user
-  const userFlightsTimes= {}; // timestamp of that event
-  const userRecorded    = {};
-  const userNames       = {};
+// ── BADGES ────────────────────────────────────────────────────────
+function renderBadges() {
+  const userRecorded   = {};
+  const userNames      = {};
+  const userLastFlight = {}; // last flight timestamp per user
+  const userActive30   = {};
+  const now            = new Date();
+  const thirtyDaysAgo  = new Date(now); thirtyDaysAgo.setDate(now.getDate() - 30);
+  const recentFlights  = []; // {userId, timestamp} for last 5 table
+
   allEvents.forEach(e => {
     if (!e.userId) return;
-    if (e.totalFlights !== undefined && e.totalFlights !== '') {
-      const ts = parseDate(e.timestamp).getTime();
-      if (!userFlightsTimes[e.userId] || ts > userFlightsTimes[e.userId]) {
-        userFlightsTimes[e.userId] = ts;
-        userFlights[e.userId] = parseInt(e.totalFlights) || 0;
-      }
+    if (e.sheetName) userNames[e.userId] = e.sheetName;
+    const ts = parseDate(e.timestamp);
+    if (e.event === 'flight_recorded') {
+      userRecorded[e.userId] = (userRecorded[e.userId] || 0) + 1;
+      if (!userLastFlight[e.userId] || ts > userLastFlight[e.userId]) userLastFlight[e.userId] = ts;
+      if (ts >= thirtyDaysAgo) userActive30[e.userId] = (userActive30[e.userId] || 0) + 1;
+      recentFlights.push({ userId: e.userId, ts });
     }
-    if (e.event === 'flight_recorded') userRecorded[e.userId] = (userRecorded[e.userId] || 0) + 1;
-    if (e.sheetName)                   userNames[e.userId]    = e.sheetName;
   });
 
-  // Card 1: most logbook flights
-  const topLogbook = Object.entries(userFlights).sort((a, b) => b[1] - a[1])[0];
-  if (topLogbook) {
-    document.getElementById('sumTopUser').textContent    = userNames[topLogbook[0]] || topLogbook[0];
-    document.getElementById('sumTopFlights').textContent = topLogbook[1];
+  const name   = id => userNames[id] || id;
+  const medals = ['🥇','🥈','🥉'];
+
+  // Helper: render a podium into a container element
+  function renderPodium(containerId, entries) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!entries.length) {
+      el.innerHTML = '<div class="empty-state" style="width:100%;padding-bottom:20px;">No data yet</div>';
+      return;
+    }
+    const top3  = entries.slice(0, 3);
+    const order = top3.length >= 2
+      ? [top3[1], top3[0], top3[2]].filter(Boolean)
+      : [top3[0]];
+    const classes = top3.length >= 2 ? ['p2','p1','p3'] : ['p1'];
+    const meds    = top3.length >= 2 ? ['🥈','🥇','🥉'] : ['🥇'];
+    el.innerHTML  = order.map((u, i) => `
+      <div class="podium-col">
+        <div class="podium-name">${name(u[0])}</div>
+        <div class="podium-count">${u[1]} flights</div>
+        <div class="podium-block ${classes[i]}">${meds[i]}</div>
+      </div>`).join('');
   }
 
-  // Card 2: most recorded via app
-  const topRecorded = Object.entries(userRecorded).sort((a, b) => b[1] - a[1])[0];
-  if (topRecorded) {
-    const el = document.getElementById('sumTopRecUser');
-    if (el) el.textContent = userNames[topRecorded[0]] || topRecorded[0];
-    document.getElementById('sumTopRecorded').textContent = topRecorded[1];
+  // Podium 1: Top Logger all time
+  renderPodium('podiumWrap', Object.entries(userRecorded).sort((a,b) => b[1]-a[1]));
+
+  // Podium 2: Most Active last 30 days
+  renderPodium('podiumMonthWrap', Object.entries(userActive30).sort((a,b) => b[1]-a[1]));
+
+  // Table: Most Recent — last 5 UNIQUE users to log a flight
+  const seenUsers = {};
+  recentFlights.sort((a,b) => b.ts - a.ts).forEach(f => {
+    if (!seenUsers[f.userId]) seenUsers[f.userId] = f.ts;
+  });
+  const last5unique = Object.entries(seenUsers)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 5);
+
+  const recentTbl = document.getElementById('badgeRecentTable');
+  if (recentTbl) {
+    recentTbl.innerHTML = last5unique.length
+      ? last5unique.map((f, i) => `<tr class="${i===0?'bwinner':''}">
+          <td class="bmedal" style="font-size:13px;color:var(--text3);">${i+1}</td>
+          <td class="bname">${name(f[0])}</td>
+          <td class="bval">${fmtRelative(f[1])}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3);">No flights recorded yet</td></tr>';
   }
 }
 
@@ -1039,14 +1194,14 @@ function renderUsers() {
   });
 
   _usersData = Object.values(users);
-  document.getElementById('usersCount').textContent = _usersData.length + ' משתמשים';
+  document.getElementById('usersCount').textContent = _usersData.length + ' users';
   renderUsersTable();
 }
 
 function renderUsersTable() {
   if (!_usersData.length) {
     document.getElementById('usersTableBody').innerHTML =
-      '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3);">אין נתונים</td></tr>';
+      '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">No data</td></tr>';
     return;
   }
 
@@ -1057,37 +1212,37 @@ function renderUsersTable() {
     el.textContent = k === _sortKey ? (_sortDir === -1 ? '▼' : '▲') : '';
   });
 
-  const maxFlights = Math.max(..._usersData.map(u => u.flights), 0);
-
   const sorted = [..._usersData].sort((a, b) => {
     let av = a[_sortKey], bv = b[_sortKey];
     if (_sortKey === 'lastSeen' || _sortKey === 'firstSeen') {
-      av = av ? av.getTime() : 0;
-      bv = bv ? bv.getTime() : 0;
-    } else if (_sortKey === 'name' || _sortKey === 'appVersion' || _sortKey === 'os') {
+      const at = av ? av.getTime() : 0;
+      const bt = bv ? bv.getTime() : 0;
+      return _sortDir === -1 ? bt - at : at - bt;
+    }
+    if (_sortKey === 'name' || _sortKey === 'appVersion' || _sortKey === 'os') {
       av = String(av).toLowerCase();
       bv = String(bv).toLowerCase();
-      return _sortDir * av.localeCompare(bv);
+      return _sortDir === -1 ? bv.localeCompare(av) : av.localeCompare(bv);
     }
-    return _sortDir * ((bv > av ? 1 : bv < av ? -1 : 0));
+    // numeric — descending: higher first
+    return _sortDir === -1 ? (bv || 0) - (av || 0) : (av || 0) - (bv || 0);
   });
 
   document.getElementById('usersTableBody').innerHTML = sorted.map(u => {
-    const isTop    = u.flights > 0 && u.flights === maxFlights;
-    const rowStyle = isTop ? 'background:rgba(251,191,36,.05);' : '';
-    const nameCell = isTop ? `🏆 ${u.name}` : u.name;
-    return `<tr style="${rowStyle}">
+    const rowStyle = '';
+    const nameCell = u.name;
+    return `<tr>
       <td>
         <div class="user-name">${nameCell}</div>
         <div class="user-id">${u.id}</div>
       </td>
+      <td><span class="last-seen" style="color:var(--text2);">${u.lastSeen ? fmtRelative(u.lastSeen) : '—'}</span></td>
       <td><span class="flights-num">${u.flights}</span></td>
       <td><span class="flights-num" style="color:var(--cyan);">${u.recorded}</span></td>
-      <td><span class="last-seen" style="color:var(--text2);">${u.firstSeen ? u.firstSeen.toLocaleDateString('he-IL') : '—'}</span></td>
-      <td><span class="last-seen" style="color:var(--text2);">${u.lastSeen ? fmtRelative(u.lastSeen) : '—'}</span></td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">${u.opens}</td>
       <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">${u.os || '—'}</td>
       <td style="font-family:var(--mono);font-size:11px;color:var(--text2);">${u.appVersion}</td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">${u.opens}</td>
+      <td><span class="last-seen" style="color:var(--text2);">${u.firstSeen ? u.firstSeen.toLocaleDateString('en-GB') : '—'}</span></td>
     </tr>`;
   }).join('');
 }
@@ -1105,10 +1260,10 @@ function renderDevices() {
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 
   const totalEl = document.getElementById('deviceTotal');
-  if (totalEl) totalEl.textContent = total + ' אירועים';
+  if (totalEl) totalEl.textContent = total + ' events';
 
   if (!sorted.length) {
-    document.getElementById('deviceGrid').innerHTML = '<div class="empty-state">אין נתונים</div>';
+    document.getElementById('deviceGrid').innerHTML = '<div class="empty-state">No data</div>';
     return;
   }
 
@@ -1153,6 +1308,11 @@ function renderFeed() {
     events = events.filter(e => getDeviceType(e.device) === _feedOS);
   }
 
+  // Apply PWA filter
+  if (_feedPWA !== 'all') {
+    events = events.filter(e => (e.isPWA || '').toLowerCase() === _feedPWA);
+  }
+
   // Apply event type filter
   if (_feedFilter !== 'all') {
     events = events.filter(e => e.event === _feedFilter);
@@ -1175,15 +1335,15 @@ function renderFeed() {
   // _feedRange === 0 means all — no filter
 
   if (!events.length) {
-    document.getElementById('feedList').innerHTML = '<div class="empty-state" style="padding:24px 0;">אין אירועים</div>';
+    document.getElementById('feedList').innerHTML = '<div class="empty-state" style="padding:24px 0;">No events</div>';
     return;
   }
 
   const eventLabels = {
-    'app_open':         'כניסה לאפליקציה',
-    'flight_recorded':  'רשם טיסה',
-    'flight_archived':  'ארכב טיסה',
-    'setup_completed':  'הצטרף למערכת'
+    'app_open':         'App opened',
+    'flight_recorded':  'Flight logged',
+    'flight_archived':  'Flight archived',
+    'setup_completed':  'New install'
   };
   const dotClass = {
     'app_open':        'fd-open',
@@ -1240,11 +1400,11 @@ function fmtRelative(d) {
   const min  = Math.floor(diff / 60000);
   const hr   = Math.floor(min / 60);
   const day  = Math.floor(hr / 24);
-  if (min < 2)   return 'עכשיו';
-  if (min < 60)  return `לפני ${min} דק'`;
-  if (hr < 24)   return `לפני ${hr} שע'`;
-  if (day < 7)   return `לפני ${day} ימים`;
-  return d.toLocaleDateString('he-IL');
+  if (min < 2)   return 'just now';
+  if (min < 60)  return `${min}m ago`;
+  if (hr < 24)   return `${hr}h ago`;
+  if (day < 7)   return `${day}d ago`;
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
 }
 
 function getDeviceType(device) {
@@ -1292,13 +1452,12 @@ function renderErrors() {
   const count        = errorEvents.filter(e => e.event === 'connection_error').length;
   const successCount = errorEvents.filter(e => e.event === 'connection_success').length;
   document.getElementById('errorsCount').textContent =
-    `${count} שגיאות · ${successCount} הצלחות`;
+    `${count} errors · ${successCount} successes`;
 
-  // Show badge on header if there are errors (even while collapsed)
   const badge = document.getElementById('errorsBadge');
   if (badge) {
     if (count > 0) {
-      badge.textContent = count + ' שגיאות';
+      badge.textContent = count + ' errors';
       badge.style.display = 'inline-block';
     } else {
       badge.style.display = 'none';
@@ -1307,14 +1466,14 @@ function renderErrors() {
 
   if (!errorEvents.length) {
     document.getElementById('errorsTableBody').innerHTML =
-      '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">אין רשומות</td></tr>';
+      '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);">No records</td></tr>';
     return;
   }
 
   document.getElementById('errorsTableBody').innerHTML = errorEvents.map(e => {
     const isErr = e.event === 'connection_error';
     const color = isErr ? 'var(--red)' : '#a78bfa';
-    const label = isErr ? '🔴 שגיאה' : '🟢 הצלחה';
+    const label = isErr ? '🔴 Error' : '🟢 Success';
     return `<tr>
       <td><span class="last-seen">${fmtRelative(parseDate(e.timestamp))}</span></td>
       <td><span style="color:${color};font-weight:700;font-size:11px;">${label}</span></td>
