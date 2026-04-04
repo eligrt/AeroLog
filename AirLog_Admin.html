@@ -450,8 +450,9 @@ body::before {
 }
 .tab-bar::-webkit-scrollbar { display: none; }
 .tab-btn {
-  padding: 10px 20px;
-  font-size: 13px;
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text3);
   background: none;
@@ -461,8 +462,9 @@ body::before {
   cursor: pointer;
   white-space: nowrap;
   font-family: var(--mono);
-  letter-spacing: .04em;
+  letter-spacing: .02em;
   transition: color .15s;
+  text-align: center;
 }
 .tab-btn:hover { color: var(--text2); }
 .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
@@ -789,7 +791,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.15 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.16 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -858,7 +860,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.15';
+const ADMIN_VERSION = 'v2.16';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
