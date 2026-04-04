@@ -359,6 +359,8 @@ body::before {
   font-family: var(--mono);
   flex-shrink: 0;
   text-align: left;
+  min-width: 80px;
+  direction: ltr;
 }
 
 /* ── ACTIVITY CHART ── */
@@ -597,39 +599,45 @@ body::before {
       <button class="feed-pill" onclick="resetFeedFilters()" style="font-size:10px;padding:3px 10px;color:var(--text3);border-color:var(--border);">↺ איפוס סינון</button>
     </div>
     <!-- Row 1: User -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;direction:rtl;align-items:center;">
-      <span style="font-size:11px;color:var(--text3);flex-shrink:0;">משתמש:</span>
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">משתמש</div>
       <select id="feedUserFilter" onchange="renderFeed()"
-        style="font-family:var(--sans);font-size:12px;background:var(--raised);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer;flex:1;">
+        style="font-family:var(--sans);font-size:12px;background:var(--raised);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer;width:100%;">
         <option value="all">כולם</option>
       </select>
     </div>
     <!-- Row 2: Event type -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;direction:rtl;align-items:center;">
-      <span style="font-size:11px;color:var(--text3);align-self:center;">סוג אירוע:</span>
-      <button class="feed-pill active" onclick="setFeedFilter('all')" id="fp-all">הכל</button>
-      <button class="feed-pill" onclick="setFeedFilter('flight_recorded')" id="fp-flight_recorded">✈ רישום טיסה</button>
-      <button class="feed-pill" onclick="setFeedFilter('app_open')" id="fp-app_open">📲 כניסות</button>
-      <button class="feed-pill" onclick="setFeedFilter('flight_archived')" id="fp-flight_archived">🗄 ארכוב טיסה</button>
-      <button class="feed-pill" onclick="setFeedFilter('setup_completed')" id="fp-setup_completed">🆕 הצטרפות</button>
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">סוג אירוע</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="feed-pill active" onclick="setFeedFilter('all')" id="fp-all">הכל</button>
+        <button class="feed-pill" onclick="setFeedFilter('flight_recorded')" id="fp-flight_recorded">רישום טיסה</button>
+        <button class="feed-pill" onclick="setFeedFilter('app_open')" id="fp-app_open">כניסות</button>
+        <button class="feed-pill" onclick="setFeedFilter('flight_archived')" id="fp-flight_archived">ארכוב טיסה</button>
+        <button class="feed-pill" onclick="setFeedFilter('setup_completed')" id="fp-setup_completed">הצטרפות</button>
+      </div>
     </div>
     <!-- Row 2b: OS filter -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;direction:rtl;align-items:center;">
-      <span style="font-size:11px;color:var(--text3);align-self:center;">מערכת הפעלה:</span>
-      <button class="feed-pill active" onclick="setFeedOS('all')" id="fo-all">הכל</button>
-      <button class="feed-pill" onclick="setFeedOS('Android')" id="fo-Android">Android</button>
-      <button class="feed-pill" onclick="setFeedOS('iPhone')" id="fo-iPhone">iPhone</button>
-      <button class="feed-pill" onclick="setFeedOS('iPad')" id="fo-iPad">iPad</button>
-      <button class="feed-pill" onclick="setFeedOS('Desktop')" id="fo-Desktop">Desktop</button>
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">מערכת הפעלה</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="feed-pill active" onclick="setFeedOS('all')" id="fo-all">הכל</button>
+        <button class="feed-pill" onclick="setFeedOS('Android')" id="fo-Android">Android</button>
+        <button class="feed-pill" onclick="setFeedOS('iPhone')" id="fo-iPhone">iPhone</button>
+        <button class="feed-pill" onclick="setFeedOS('iPad')" id="fo-iPad">iPad</button>
+        <button class="feed-pill" onclick="setFeedOS('Desktop')" id="fo-Desktop">Desktop</button>
+      </div>
     </div>
     <!-- Row 3: Range -->
-    <div style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;direction:rtl;align-items:center;">
-      <span style="font-size:11px;color:var(--text3);align-self:center;">טווח:</span>
-      <button class="feed-pill active" onclick="setFeedRange(5)"  id="fr-5">5 אחרונים</button>
-      <button class="feed-pill" onclick="setFeedRange(20)" id="fr-20">20 אחרונים</button>
-      <button class="feed-pill" onclick="setFeedRange(30)" id="fr-30">חודש</button>
-      <button class="feed-pill" onclick="setFeedRange(90)" id="fr-90">3 חודשים</button>
-      <button class="feed-pill" onclick="setFeedRange(0)"  id="fr-0">הכל</button>
+    <div style="padding:8px 16px;border-bottom:1px solid var(--border);direction:rtl;">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono);">טווח</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="feed-pill active" onclick="setFeedRange(5)"  id="fr-5">5 אחרונים</button>
+        <button class="feed-pill" onclick="setFeedRange(20)" id="fr-20">20 אחרונים</button>
+        <button class="feed-pill" onclick="setFeedRange(30)" id="fr-30">חודש</button>
+        <button class="feed-pill" onclick="setFeedRange(90)" id="fr-90">3 חודשים</button>
+        <button class="feed-pill" onclick="setFeedRange(0)"  id="fr-0">הכל</button>
+      </div>
     </div>
     <div class="sec-body" style="padding:0 16px;">
       <div class="feed-list" id="feedList">
@@ -673,7 +681,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.04 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.05 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
   <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;" id="debugLastTs"></div>
 </div>
@@ -737,7 +745,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.04';
+const ADMIN_VERSION = 'v2.05';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -1172,10 +1180,10 @@ function renderFeed() {
   }
 
   const eventLabels = {
-    'app_open':         '📲 כניסה לאפליקציה',
-    'flight_recorded':  '✈ רשם טיסה',
-    'flight_archived':  '🗄 ארכב טיסה',
-    'setup_completed':  '🆕 הצטרף למערכת'
+    'app_open':         'כניסה לאפליקציה',
+    'flight_recorded':  'רשם טיסה',
+    'flight_archived':  'ארכב טיסה',
+    'setup_completed':  'הצטרף למערכת'
   };
   const dotClass = {
     'app_open':        'fd-open',
