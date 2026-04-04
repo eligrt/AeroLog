@@ -66,58 +66,62 @@ body::before {
 .admin-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-.admin-badge {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--accent);
-  background: rgba(126,184,247,.1);
-  border: 1px solid rgba(126,184,247,.3);
-  border-radius: 20px;
-  padding: 2px 8px;
-  letter-spacing: .08em;
+  gap: 8px;
 }
 .admin-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   font-family: var(--mono);
   letter-spacing: .04em;
 }
 .admin-subtitle {
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text3);
   font-family: var(--mono);
+  letter-spacing: .08em;
 }
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
-.last-refresh {
-  font-size: 10px;
-  color: var(--text3);
-  font-family: var(--mono);
-}
-.btn-refresh {
+.icon-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  background: rgba(126,184,247,.08);
-  border: 1px solid var(--border2);
+  justify-content: center;
+  background: rgba(126,184,247,.06);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: var(--accent2);
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--text2);
+  font-size: 16px;
   cursor: pointer;
-  transition: all .15s;
+  transition: background .15s, border-color .15s;
 }
-.btn-refresh:hover { background: rgba(126,184,247,.15); }
-.btn-refresh.loading { opacity: .6; pointer-events: none; }
+.icon-btn:hover { background: rgba(126,184,247,.12); border-color: var(--border2); }
+.icon-btn.spinning { animation: spin .7s linear infinite; }
+.icon-btn-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  background: #f87171;
+  color: #1a0808;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 1.5px solid var(--bg2);
+}
 .spin { display: inline-block; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -524,17 +528,16 @@ body::before {
 <!-- HEADER -->
 <div class="admin-header">
   <div class="admin-logo">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div class="admin-title">✈ AirLog</div>
-      <div class="admin-badge">🛡 ADMIN</div>
-    </div>
+    <div class="admin-title">✈ AirLog</div>
+    <div class="admin-subtitle">ADMIN</div>
   </div>
   <div class="header-right">
-    <button class="btn-refresh" id="btnSettings" onclick="openSettings()" style="background:rgba(126,184,247,.06);border-color:var(--border);">
-      ⚙ Settings<span id="blockedBadge" style="display:none;margin-left:6px;font-size:10px;background:rgba(248,113,113,.2);color:#f87171;border-radius:10px;padding:1px 6px;font-family:var(--mono);"></span>
+    <button class="icon-btn" id="btnSettings" onclick="openSettings()" title="Settings">
+      ⚙
+      <span id="blockedBadge" style="display:none;" class="icon-btn-badge"></span>
     </button>
-    <button class="btn-refresh" id="btnRefresh" onclick="loadAll()">
-      <span id="refreshIcon">↻</span> Refresh
+    <button class="icon-btn" id="btnRefresh" onclick="loadAll()" title="Refresh">
+      <span id="refreshIcon">↻</span>
     </button>
   </div>
 </div>
@@ -848,7 +851,7 @@ body::before {
 </div>
 
 <div class="admin-footer">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.19 <span id="footerUpdateTime"></span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.20 <span id="footerUpdateTime"></span></div>
   <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
 </div>
 
@@ -917,7 +920,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.19';
+const ADMIN_VERSION = 'v2.20';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -929,7 +932,7 @@ async function loadAll() {
   const ver     = document.getElementById('loadingVersion');
 
   btn.classList.add('loading');
-  icon.classList.add('spin');
+  icon.classList.add('spinning');
   overlay.style.display = 'flex';
   if (ver) ver.textContent = ADMIN_VERSION;
   barFill.style.transition = 'width .4s ease';
@@ -988,7 +991,7 @@ async function loadAll() {
   }
 
   btn.classList.remove('loading');
-  icon.classList.remove('spin');
+  icon.classList.remove('spinning');
 }
 
 // ── USER VISIBILITY SETTINGS ─────────────────────────────────────
@@ -1012,8 +1015,8 @@ function saveBlockedUsers() {
   const badge = document.getElementById('blockedBadge');
   if (badge) {
     if (blockedUsers.size > 0) {
-      badge.textContent = blockedUsers.size + ' hidden';
-      badge.style.display = 'inline';
+      badge.textContent = blockedUsers.size;
+      badge.style.display = 'flex';
     } else {
       badge.style.display = 'none';
     }
