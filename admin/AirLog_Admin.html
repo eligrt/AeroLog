@@ -829,7 +829,7 @@ body::before {
 
   <!-- FOOTER inside page so it shows on all tabs -->
   <div class="admin-footer">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.25 <span id="footerUpdateTime"></span></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.26 <span id="footerUpdateTime"></span></div>
     <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
   </div>
 
@@ -948,7 +948,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.25';
+const ADMIN_VERSION = 'v2.26';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -1559,14 +1559,22 @@ function parseDate(str) {
   if (!str) return new Date(0);
   str = String(str).trim();
 
-  // New format (v5.1+): yyyy-MM-dd HH:mm:ss
+  // Format: yyyy-MM-dd HH:mm:ss
   const iso = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-  if (iso) return new Date(
-    parseInt(iso[1]), parseInt(iso[2]) - 1, parseInt(iso[3]),
-    parseInt(iso[4]), parseInt(iso[5]), parseInt(iso[6] || 0)
-  );
+  if (iso) {
+    const yyyy = parseInt(iso[1]), MM = parseInt(iso[2]), dd = parseInt(iso[3]);
+    // Validate: month must be 1-12, day must be 1-31
+    // If month > 12 it's a swapped yyyy-dd-MM — swap back silently
+    if (MM > 12 && dd <= 12) {
+      return new Date(yyyy, dd - 1, MM, parseInt(iso[4]), parseInt(iso[5]), parseInt(iso[6] || 0));
+    }
+    if (MM >= 1 && MM <= 12) {
+      return new Date(yyyy, MM - 1, dd, parseInt(iso[4]), parseInt(iso[5]), parseInt(iso[6] || 0));
+    }
+    return new Date(0); // invalid
+  }
 
-  // Legacy format (v5): dd/MM/yyyy HH:mm:ss
+  // Legacy format: dd/MM/yyyy HH:mm:ss
   const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
   if (dmy) return new Date(
     parseInt(dmy[3]), parseInt(dmy[2]) - 1, parseInt(dmy[1]),
