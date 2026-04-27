@@ -830,7 +830,7 @@ body::before {
 
   <!-- FOOTER inside page so it shows on all tabs -->
   <div class="admin-footer">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.27 <span id="footerUpdateTime"></span></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.28 <span id="footerUpdateTime"></span></div>
     <div style="font-size:11px;color:var(--text2);margin-top:2px;">built by eligrt</div>
   </div>
 
@@ -949,7 +949,7 @@ function resetFeedFilters() {
 }
 
 // ── LOAD ────────────────────────────────────────────────────────
-const ADMIN_VERSION = 'v2.27';
+const ADMIN_VERSION = 'v2.28';
 
 async function loadAll() {
   const btn     = document.getElementById('btnRefresh');
@@ -1364,7 +1364,12 @@ function renderUsers(ev) {
     if (e.device)     users[id].device     = e.device;
     if (e.os)         users[id].os         = e.os;
     if (e.appVersion) users[id].appVersion = e.appVersion;
-    if (e.event === 'app_open')        users[id].opens++;
+
+    const ts = parseDate(e.timestamp);
+    if (!users[id].lastSeen  || ts > users[id].lastSeen)  users[id].lastSeen  = ts;
+    if (!users[id].firstSeen || ts < users[id].firstSeen) users[id].firstSeen = ts;
+
+    if (e.event === 'app_open') users[id].opens++;
     if (e.event === 'flight_recorded') {
       users[id].recorded++;
       if (!users[id].lastFlight || ts > users[id].lastFlight) users[id].lastFlight = ts;
@@ -1372,16 +1377,12 @@ function renderUsers(ev) {
 
     // Use most-recent totalFlights, not max
     if (e.totalFlights !== undefined && e.totalFlights !== '') {
-      const ts = parseDate(e.timestamp).getTime();
-      if (ts > users[id].flightsTime) {
-        users[id].flightsTime = ts;
+      const tsMs = ts.getTime();
+      if (tsMs > users[id].flightsTime) {
+        users[id].flightsTime = tsMs;
         users[id].flights     = parseInt(e.totalFlights) || 0;
       }
     }
-
-    const ts = parseDate(e.timestamp);
-    if (!users[id].lastSeen  || ts > users[id].lastSeen)  users[id].lastSeen  = ts;
-    if (!users[id].firstSeen || ts < users[id].firstSeen) users[id].firstSeen = ts;
   });
 
   _usersData = Object.values(users);
