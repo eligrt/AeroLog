@@ -1267,10 +1267,10 @@ tbody td:first-child { color: var(--text); font-weight: 600; font-family: var(--
   flex-shrink: 0;
 }
 .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
-.filter-row-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-.filter-row-lbl { font-size: 10px; font-weight: 700; color: var(--text3); min-width: 30px; text-align: right; flex-shrink: 0; letter-spacing: .03em; }
-.filter-row-wrap .pill-group { flex: 1; display: flex; gap: 6px; justify-content: flex-start; }
-.filter-row-wrap .pill-group .pill { width: calc(25% - 5px); text-align: center; min-width: 0; flex: none; }
+.filter-row-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.filter-row-lbl { font-size: 10px; font-weight: 700; color: var(--text3); min-width: 28px; text-align: right; flex-shrink: 0; letter-spacing: .03em; }
+.filter-row-wrap .pill-group { flex: 1; display: flex; gap: 5px; }
+.filter-row-wrap .pill-group .pill { width: calc((100% - 15px) / 4); flex: none; text-align: center; padding: 5px 4px; font-size: 11px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pill {
   padding: 5px 13px;
   border: 1.5px solid var(--border2);
@@ -2756,7 +2756,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.27<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.29<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2917,7 +2917,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.27',
+      appVersion:   'v2.29',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -3037,7 +3037,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.27',
+        'App Ver:    v2.29',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -5775,7 +5775,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.27</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.29</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5827,7 +5827,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.27</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.29</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
