@@ -57,7 +57,7 @@
   --r-sm: 8px;
 }
 
-html { font-size: 16px; overflow: hidden; height: 100%; }
+html { font-size: 16px; overflow-y: scroll; }
 
 body {
   font-family: var(--sans);
@@ -65,8 +65,6 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
-  overflow-y: scroll;
-  height: 100%;
 }
 
 /* subtle radial glow at top */
@@ -1269,6 +1267,10 @@ tbody td:first-child { color: var(--text); font-weight: 600; font-family: var(--
   flex-shrink: 0;
 }
 .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-row-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.filter-row-lbl { font-size: 10px; font-weight: 700; color: var(--text3); min-width: 30px; text-align: right; flex-shrink: 0; letter-spacing: .03em; }
+.filter-row-wrap .pill-group { flex: 1; display: flex; gap: 6px; justify-content: flex-start; }
+.filter-row-wrap .pill-group .pill { width: calc(25% - 5px); text-align: center; min-width: 0; flex: none; }
 .pill {
   padding: 5px 13px;
   border: 1.5px solid var(--border2);
@@ -2524,16 +2526,39 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
       <div class="card-body" style="padding:14px 16px;gap:10px;">
         <div class="search-hint" style="font-size:11px;">חפש לפי מקום, תרגיל או נושא · <span style="color:var(--text3);">מגידו, רוח צד, נחיתה...</span></div>
 
-        <!-- Journal period filter -->
-        <div class="pill-group" id="journalPills" style="flex-wrap:wrap;gap:6px;margin-bottom:4px;">
-          <button class="pill"        data-jp="all"   onclick="setJournalPeriod('all')">הכל</button>
-          <button class="pill active" data-jp="last6" onclick="setJournalPeriod('last6')">6 טיסות אחרונות</button>
-          <button class="pill"        data-jp="d30"   onclick="setJournalPeriod('d30')">30 יום</button>
-          <button class="pill"        data-jp="d90"   onclick="setJournalPeriod('d90')">90 יום</button>
-          <button class="pill"        data-jp="xc"    onclick="setJournalPeriod('xc')">XC</button>
+        <!-- Row 1: Period filter -->
+        <div class="filter-row-wrap">
+          <span class="filter-row-lbl">מתי</span>
+          <div class="pill-group" id="journalPills">
+            <button class="pill"        data-jp="all"   onclick="setJournalPeriod('all')">הכל</button>
+            <button class="pill active" data-jp="last7" onclick="setJournalPeriod('last7')">7 אחרונות</button>
+            <button class="pill"        data-jp="d30"   onclick="setJournalPeriod('d30')">30 יום</button>
+            <button class="pill"        data-jp="d90"   onclick="setJournalPeriod('d90')">90 יום</button>
+          </div>
         </div>
-        <div id="journalAcDropWrap" style="display:none;">
-          <select id="journalAcSelect" onchange="setJournalAc(this.value)">
+        <!-- Row 2: Flight type filter -->
+        <div class="filter-row-wrap">
+          <span class="filter-row-lbl">סוג</span>
+          <div class="pill-group" id="journalTypePills">
+            <button class="pill active" data-jt="all"        onclick="setJournalType('all')">הכל</button>
+            <button class="pill"        data-jt="xc"         onclick="setJournalType('xc')">🗺 XC</button>
+            <button class="pill"        data-jt="night"      onclick="setJournalType('night')">🌙 לילה</button>
+            <button class="pill"        data-jt="levelCheck" onclick="setJournalType('levelCheck')">📋 מבחן רמה</button>
+          </div>
+        </div>
+        <!-- Row 3: Role filter -->
+        <div class="filter-row-wrap">
+          <span class="filter-row-lbl">תפקיד</span>
+          <div class="pill-group" id="journalRolePills">
+            <button class="pill active" data-jr="all"  onclick="setJournalRole('all')">הכל</button>
+            <button class="pill"        data-jr="pic"  onclick="setJournalRole('pic')">✈ PIC</button>
+            <button class="pill"        data-jr="dual" onclick="setJournalRole('dual')">🎓 Dual</button>
+          </div>
+        </div>
+        <!-- Row 4: Aircraft filter -->
+        <div class="filter-row-wrap" id="journalAcDropWrap" style="display:none;">
+          <span class="filter-row-lbl">מטוס</span>
+          <select id="journalAcSelect" onchange="setJournalAc(this.value)" style="flex:1;">
             <option value="">כל המטוסים</option>
           </select>
         </div>
@@ -2731,7 +2756,7 @@ textarea { resize: none; overflow: hidden; min-height: 56px; }
   </div><!-- /view-settings -->
 
   <div class="app-footer">
-    <div class="footer-meta" dir="ltr">v2.20<span id="footerStamp"></span></div>
+    <div class="footer-meta" dir="ltr">v2.27<span id="footerStamp"></span></div>
     <div class="footer-credit">built by eligrt</div>
   </div>
 
@@ -2892,7 +2917,7 @@ async function reportEvent(event, extraData = {}) {
       userId,
       device,
       os,
-      appVersion:   'v2.20',
+      appVersion:   'v2.27',
       totalFlights: extraData.totalFlights || 0,
       status:       extraData.status       || 'success',
       errorMsg:     extraData.errorMsg     || '',
@@ -3012,7 +3037,7 @@ async function saveSetup() {
         'AirLog iOS Error Report',
         '=======================',
         'Timestamp:  ' + now,
-        'App Ver:    v2.20',
+        'App Ver:    v2.27',
         'Device:     ' + device,
         'OS:         ' + os,
         'Browser:    ' + browser,
@@ -3686,9 +3711,9 @@ function updatePeriodNote() {
     d30:   () => { const f=new Date(now); f.setDate(f.getDate()-30); return fmt(f)+' — '+fmt(now); },
     d90:   () => { const f=new Date(now); f.setDate(f.getDate()-90); return fmt(f)+' — '+fmt(now); },
     d365:  () => { const f=new Date(now); f.setDate(f.getDate()-365); return fmt(f)+' — '+fmt(now); },
-    last6: () => {
-      if (!allRows.length) return '6 טיסות אחרונות';
-      const sorted = [...allRows].sort((a,b) => b.date.localeCompare(a.date)).slice(0,6);
+    last7: () => {
+      if (!allRows.length) return '7 טיסות אחרונות';
+      const sorted = [...allRows].sort((a,b) => b.date.localeCompare(a.date)).slice(0,7);
       if (sorted.length < 2) return sorted.length ? fmt(sorted[0].date) : '—';
       return fmt(sorted[sorted.length-1].date) + ' — ' + fmt(sorted[0].date);
     },
@@ -4033,7 +4058,7 @@ function applyFilters() {
     else if (activePeriod === 'd30')   { if (rDate < daysAgo(30))    return false; }
     else if (activePeriod === 'd90')   { if (rDate < daysAgo(90))    return false; }
     else if (activePeriod === 'd365')  { if (rDate < daysAgo(365))   return false; }
-    else if (activePeriod === 'last6') { /* handled by slice below  */ }
+    else if (activePeriod === 'last7') { /* handled by slice below  */ }
     else if (activePeriod === 'custom') {
       const v1 = el('fFrom') ? el('fFrom').value : '';
       const v2 = el('fTo')   ? el('fTo').value   : '';
@@ -4047,8 +4072,8 @@ function applyFilters() {
     return true;
   });
 
-  if (activePeriod === 'last6') {
-    filtered = filtered.slice().sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 6);
+  if (activePeriod === 'last7') {
+    filtered = filtered.slice().sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 7);
   }
 
   renderStats(filtered);
@@ -4766,13 +4791,29 @@ function renderMonthly() {
   el('monthlyChartBody').innerHTML = svg + legend;
 }
 
-let journalPeriod = 'last6';
-let journalAcFilter = ''; // '' = all aircraft
+let journalPeriod = 'last7';
+let journalAcFilter = '';   // '' = all aircraft
+let journalTypeFilter = 'all'; // all / xc / night / levelCheck
+let journalRoleFilter = 'all'; // all / pic / dual
 
 function setJournalPeriod(p) {
   journalPeriod = p;
   document.querySelectorAll('#journalPills .pill').forEach(b =>
     b.classList.toggle('active', b.dataset.jp === p));
+  searchJournal();
+}
+
+function setJournalType(t) {
+  journalTypeFilter = t;
+  document.querySelectorAll('#journalTypePills .pill').forEach(b =>
+    b.classList.toggle('active', b.dataset.jt === t));
+  searchJournal();
+}
+
+function setJournalRole(r) {
+  journalRoleFilter = r;
+  document.querySelectorAll('#journalRolePills .pill').forEach(b =>
+    b.classList.toggle('active', b.dataset.jr === r));
   searchJournal();
 }
 
@@ -4878,18 +4919,23 @@ function populateJournalAcPills() {
 }
 
 function filterJournalRows(rows) {
-  // apply aircraft filter first
+  // Aircraft filter
   if (journalAcFilter) {
     rows = rows.filter(r => (r.acType || r.aircraft || '') === journalAcFilter);
   }
+  // Type filter (XC / night / levelCheck)
+  if (journalTypeFilter === 'xc')         rows = rows.filter(r => (r.xc         || '').includes('כן'));
+  else if (journalTypeFilter === 'night') rows = rows.filter(r => (r.night      || '').includes('כן'));
+  else if (journalTypeFilter === 'levelCheck') rows = rows.filter(r => (r.levelCheck || '').includes('כן'));
+  // Role filter (PIC / Dual)
+  if (journalRoleFilter === 'pic')        rows = rows.filter(r => parseHM(r.pic  || '0:00') > 0);
+  else if (journalRoleFilter === 'dual')  rows = rows.filter(r => parseHM(r.dual || '0:00') > 0);
+  // Period filter
   if (journalPeriod === 'all') return rows;
   const now = new Date();
   const daysAgo = n => { const d = new Date(now); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); };
-  if (journalPeriod === 'last6') {
-    return [...rows].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0,6);
-  }
-  if (journalPeriod === 'xc') {
-    return rows.filter(r => (r.xc || '').includes('כן'));
+  if (journalPeriod === 'last7') {
+    return [...rows].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0,7);
   }
   const cutoff = journalPeriod === 'd30' ? daysAgo(30) : daysAgo(90);
   return rows.filter(r => (r.date||'').slice(0,10) >= cutoff);
@@ -5729,7 +5775,7 @@ function createNewSheet() {
   </div>
   <div class="splash-label" id="splashLabel">מתחבר לשרת...</div>
   <div style="position:absolute;bottom:32px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.20</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.27</div>
     <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
   </div>
 </div>
@@ -5781,7 +5827,7 @@ function createNewSheet() {
     </button>
     <div class="setup-note">🔒 הכתובת נשמרת רק במכשיר שלך ולא משותפת עם אף אחד.</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.20</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">v2.27</div>
       <div style="font-size:11px;color:var(--text2);">built by eligrt</div>
     </div>
   </div>
